@@ -1,0 +1,135 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+  <HEAD>
+	<TITLE>Chart::Graph::gnuplot()</TITLE>
+  </HEAD>   
+  <BODY BGCOLOR="#ffffff">
+	<TABLE CELLSPACING=0 CELLPADDING=0 border="0" width="100%">
+	  <TR>
+		<TD>
+		  <A HREF="http://www.caida.org">
+			<IMG ALT="Caida" 
+			  SRC="http://www.caida.org/images/CAIDAlogo_small.gif" WIDTH="105" HEIGHT="137" BORDER="0" ALIGN="LEFT"></A>
+		</td> 
+		<td align=center width="100%">
+		  <H1>Chart::Graph::gnuplot()</H1>
+		</td>
+	  </TR>
+	</TABLE>
+
+
+
+    <hr>
+    <ul>
+      <li><a href="#Description">Description</a></li>
+      <li><a href="#Calling gnuplot()">Calling gnuplot()</a></li>
+      <li><a href="#Arguments">Arguments</a></li>
+      <li><a href="#Example">Example</a></li>
+
+    </ul>
+
+    <hr>
+    <h2><a name="Description">Description</a></h2>
+    <p>
+      <b>gnuplot()</b> is a function in module Chart::Graph that lets you generate graphs on the 
+      fly in perl. It was written as a front-end application to gnuplot for hassle-free
+      generation of graphs. <b>gnuplot()</b> can be supplied with many of the same 
+      options and arguments that can be given to gnuplot.
+    </p>
+
+
+    <hr>
+    <h2><a name="Calling gnuplot()">Calling gnuplot()</a></h2>
+    <pre>
+#make sure to include Graph.pm
+use Graph;
+
+gnuplot(\%global_options, \@data_sets);
+gnuplot(\%global_options, [\%data_set_options, \@matrix], 
+                         [\%data_set_options, \@x_column, \@y_column],
+                         [\%data_set_options, &lt filename &gt], ...] );
+    </pre>
+   
+
+    <hr>
+    <h2><a name="Arguments">Arguments</a></h2>
+    <p>
+      <i>%global_options:</i><br>
+      <table border = 1>
+	<tr><td><b>Name</b></td><td><b>Options</b></td><td><b>Default</b></td></tr>
+	<tr><td>"title"</td> <td>(set your own title)</td> <td>"untitled"</td></tr>
+	<tr><td>"output type"</td><td>"pbm" or "gif"</td><td>"gif"</td></tr>
+	<tr><td>"output file"</td><td>(set your own output file)</td><td>"gnuplot.gif"</td></tr>
+	<tr><td>"x-axis label"</td><td>(set your own label)</td><td>"x-axis"</td></tr>
+	<tr><td>"y-axis label"</td><td>(set your own label)</td><td>"y-axis"</td></tr>
+	<tr><td>"x2-axis label"</td><td>(set your own label)</td><td>none</td></tr>
+	<tr><td>"y2-axis label"</td><td>(set your own label)</td><td>none</td></tr>
+	<tr><td>"logscale x"</td> <td>"0" or "1"</td>  <td>"0"</td></tr>
+	<tr><td>"logscale y"</td> <td>"0" or "1"</td>  <td>"0"</td></tr>
+	<tr><td>"logscale x2"</td> <td>"0" or "1"</td> <td>"0"</td></tr>
+	<tr> <td>"logscale y2"</td> <td>"0" or "1"</td> <td>"0"</td></tr>
+	<tr> <td>"xtics"</td> <td>(set your own tics, see example below)</td> <td>none</td></tr>
+	<tr> <td>"x2tics"</td> <td>(set your own tics, see example below)</td> <td>none</td></tr>
+	<tr> <td>"ytics"</td> <td>(set your own tics, see example below)</td> <td>none</td></tr>
+	<tr> <td>"y2tics"</td> <td>(set your own tics, see example below)</td> <td>none</td></tr>
+      </table>
+      <br>
+      <i>%data_set_options:</i><br>
+      <table border = 1>
+	<tr><td><b>Name</b></td><td><b>Options</b></td><td><b>Default</b></td></tr>
+	<tr><td>"title"</td><td>(set your own title)</td> <td>"untitled data"</td></tr>
+	<tr><td>"style"</td><td>"points", "lines", "impulses", etc...</td> <td>"points"</td></tr>
+	<tr><td>"axes"</td><td>"x1y1", "x2y2", "x1y2", etc...</td><td> "x1y1" </td></tr>
+	<tr><td>"type"</td><td>"matrix", "columns", "file"</td> <td>"none"</td></tr>
+      </table>
+      <br>
+      
+      <i>\@matrix:</i> an array of [x,y] pairs of data
+      <br> <br>
+      <i>\@x_column, \@y_column:</i> two arrays of data of equal length. \@x_column is the x-axis data. \@y_column is the y-axis data. 
+
+    
+    <hr>
+    <h2><a name="Example">Example</a></h2>
+    <p>
+    <pre>
+  use Graph;
+
+  gnuplot({"title" =&gt "foo",
+         "x2-axis label" =&gt "bar",
+         "logscale x2" =&gt "1",
+         "logscale y" =&gt "1"
+         "xtics" => [ ["small\\nfoo", 10], ["medium\\nfoo", 20], ["large\\nfoo", 30]],
+         "ytics" => [10,20,30,40,50]},
+        [{"title" =&gt "data1",
+          "type" =&gt "matrix"}, [[1, 10], 
+                                [2, 20], 
+                                [3, 30]] ],
+        [{"title" =&gt "data2",
+          "style" =&gt "lines",
+          "type" =&gt "columns"}, [8, 26, 50, 60, 70], 
+                                [5, 28, 50, 60, 70] ],
+        [{"title" =&gt "data3",
+          "style" =&gt "lines",
+          "type" =&gt "file"}, "sample"],);
+    </pre>
+    <IMG SRC="gnuplot.gif" ALT = "Graph of example">
+
+
+    <hr>
+    <p>
+      <i>page written by Michael Young</i>
+      <A HREF="http://validator.w3.org/check?url=http://www.caida.org/~mhyoung/graph/graph_gnuplot.html;weblint;outline">
+        <IMG BORDER=0 ALIGN=right
+          SRC="http://validator.w3.org/images/vh32.gif"
+          ALT="Valid HTML 3.2!" HEIGHT=31 WIDTH=88></A>
+    </p>
+
+
+    <address><a href="mailto:mhyoung@caida.org">Michael Young</a></address>
+<!-- Created: Mon Nov  2 14:22:40 PST 1998 -->
+<!-- hhmts start -->
+Last modified: Mon Apr  5 14:24:41 PDT 1999
+<!-- hhmts end -->
+  </body>
+</html>

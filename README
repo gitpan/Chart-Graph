@@ -1,0 +1,51 @@
+Graph.pm - 28/2/99
+Version 0.1
+
+Graph.pm is a module that allows easy generation of graphs within perl. Currently Graph.pm supports two packages, gnuplot and xrt, both of which you need to have installed on your system. 
+
+Please email at dmoore@caida.org if you have any problems!
+
+INSTALLATION
+
+To install Graph.pm on your system you need to run:
+
+	perl Makefile.PL
+        make
+        make install
+
+If you want support for xrt you need to compile the xrt wrapper executable and move it into your path somewhere:
+
+	cd graph_xrt
+        make 
+   
+
+USING Graph.pm
+
+Graph.pm will probe your path if you do not supply paths to the programs that it needs. 
+
+You need to set these variables if they are not in your path:
+
+For gnuplot():
+$Chart::Graph::gnuplot    # path to gnuplot 
+$Chart::Graph::ppmtogif   # path to ppmtogif
+
+For xrt():
+$Chart::Graph::ppmtogif   # path to ppmtogif
+$Chart::Graph::xrt        # path to graph(the xrt wrapper)
+$Chart::Graph::xwdtopnm   # path to xwdtopnm
+$Chart::Graph::xvfb       # path to Xvfb(the virutal frame buffer required by Xrt)
+
+Currently Chart::Graph supports two levels of debug, 0(no debug msgs) and 1(debug msgs). You need to set the $Graph::debug flag accordingly. If you are having problems with Graph.pm set the debug flag to 1. Also Graph.pm will check $ENV{TMPDIR} for the temporary file storage. If you do not speicify, it will be set to /tmp automatically.
+ 
+All the documentation(in HTML, with examples) for Graph.pm is located in doc/. Documentation is also available online at http://www.caida.org/Tools/Graph. 
+
+CONTENT SUMMARY
+
+Graph.pm 	- the acutal Graph module
+doc/    	- documentation in HTML 
+graph_xrt/	- xrt wrapper executable code
+test_Graph.pl	- the test script used for debugging
+
+AUTHOR(S)
+
+Michael Young and David Moore - dmoore@caida.org
