@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
 <HTML>
 <HEAD>
-    <TITLE>Chart::Graph::xrt()</TITLE>
+    <TITLE>Chart::Graph::xrt3d()</TITLE>
     <LINK REV=MADE HREF="mailto:mhyoung%40caida.org">
 </HEAD>
   <BODY BGCOLOR="white">
@@ -10,7 +10,7 @@
       <tr>
 	<td>
 
-	  <CENTER><H1>Chart::Graph::xrt()</H1></CENTER>
+	  <CENTER><H1>Chart::Graph::xrt3d()</H1></CENTER>
 	</td>
       </tr>
     </table>
@@ -18,29 +18,29 @@
     <hr>
     <UL>
       <LI><A HREF="#Description">Description</A></LI> 
-      <LI><A HREF="#Calling xrt()">Calling xrt()</A></LI> 
+      <LI><A HREF="#Calling xrt3d()">Calling xrt3d()</A></LI> 
       <LI><A HREF="#Arguments">Arguments</A></LI> 
       <LI><A HREF="#Example">Example</A></LI></UL>
     <HR>
 
     <H2><A NAME="Description">Description</A></H2>
     <P>
-      <B>xrt()</B> is a function in module Chart::Graph that lets you 
+      <B>xrt3d()</B> is a function in module Chart::Graph that lets you 
       generate graphs on the fly in perl. It was written as a front-end 
       application to gnuplot for hassle-free generation of graphs. You 
-      would normally use xrt to generate 3D graphs.
+      would normally use xrt3d to generate 3D graphs.
     </P>
     <HR>
 
-    <H2><A NAME="Calling xrt()">Calling xrt()</A></H2>
+    <H2><A NAME="Calling xrt3d()">Calling xrt3d()</A></H2>
     <pre>
 #make sure to include Chart::Graph
 use Chart::Graph;
 
-xrt(\%options, \@data_set);
+xrt3d(\%options, \@data_set);
 
 #say for example we have a 3 by 4 matrix -> dataxy
-xrt(\%options, 
+xrt3d(\%options, 
 	[[data11, data12, data13, data14],
 	[data21, data22, data23, data24],
 	 [data31, data32, data33, data34]])
@@ -52,7 +52,7 @@ xrt(\%options,
       <I>%options</I>
     <TABLE BORDER="1">
       <TR><TD><B>Name</B></TD> <TD><B>Options</B></TD> <TD><B>Default</B></TD></TR> 
-      <TR><TD>"output file"</TD> <TD>(set your own)</TD> <TD>"xrt.gif"</TD></TR> 
+      <TR><TD>"output file"</TD> <TD>(set your own)</TD> <TD>"untitled-xrt3d.gif"</TD></TR> 
       <TR><TD>"x-axis title"</TD> <TD>(set your own)</TD> <TD>"x-axis"</TD></TR> 
       <TR><TD>"y-axis title"</TD> <TD>(set your own)</TD> <TD>"y-axis"</TD></TR> 
       <TR><TD>"z-axis title"</TD> <TD>(set your own)</TD> <TD>"z-axis"</TD></TR> 
@@ -74,14 +74,14 @@ xrt(\%options,
 use Chart::Graph;
 
 #using a 3 by 4 matrix for the data set
-xrt({"x-ticks"=>["a", "b", "c"],
+xrt3d({"x-ticks"=>["a", "b", "c"],
 	 "y-ticks"=>["w", "x", "y", "z"],},
 	[["10", "15", "23", "10"],
 	 ["4", "13", "35", "45"],
 	 ["29", "15", "64", "24"]]);
 
     </pre>
-    <IMG BORDER="1" SRC="xrt.gif" ALT="Graph of eample using xrt"><HR>
+    <IMG BORDER="1" SRC="untitled-xrt3d.gif" ALT="Graph of eample using xrt3d"><HR>
     <TABLE WIDTH="100%" BORDER="0">
      <TR>
           <TD ALIGN="LEFT">
@@ -112,7 +112,7 @@ xrt({"x-ticks"=>["a", "b", "c"],
           //  -->
           </SCRIPT>
 
-<A HREF="http://validator.w3.org/check?url=http://www.caida.org/~mhyoung/graph/graph_xrt.html;weblint;outline"><IMG ALIGN="right" BORDER="0" WIDTH="88" SRC="http://validator.w3.org/images/vh32.gif" HEIGHT="31" ALT="Valid HTML 32"></A>
+<A HREF="http://validator.w3.org/check?url=http://www.caida.org/~mhyoung/graph/graph_xrt3d.html;weblint;outline"><IMG ALIGN="right" BORDER="0" WIDTH="88" SRC="http://validator.w3.org/images/vh32.gif" HEIGHT="31" ALT="Valid HTML 32"></A>
           </TD>
      </TR>
 </TABLE>

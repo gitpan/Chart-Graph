@@ -1,10 +1,7 @@
 #!/usr/local/bin/perl -w 
-## test_Graph.pl is a test script for the graphing package Graph.pm
-##  
+## gnuplot.t is a test script for the graphing package Graph.pm
 ##
-## USAGE: ./test_Graph <package>
-##
-## $Id: test_Graph.pl,v 1.7 1999/04/01 01:54:12 mhyoung Exp $ $name$
+## $Id: gnuplot.t,v 1.1 1999/04/27 01:49:19 mhyoung Exp $ $name$
 ##
 ## This software product is developed by Michael Young and David Moore,
 ## and copyrighted(C) 1998 by the University of California, San Diego
@@ -20,17 +17,15 @@
 ##
 ## You should have received a copy of the GNU GPL along with this program.
 ##
-## Contact: dmoore@caida.org
+## Contact: graph-request@caida.org
 ##
 
-use Chart::Graph;
+use t::Config;
+use Chart::Graph qw(gnuplot xrt3d);
 use strict;
 use File::Basename;
 
 $Chart::Graph::debug = 0; 
-$Chart::Graph::xrt = "/home/mhyoung/workspace/mhyoung/graph/graph";
-#$Chart::Graph::xwdtopnm = " /usr/local/bin/xwdtopnm";    
-$Chart::Graph::xvfb = "/ipn/dmoore/bin/Xvfb";
 
 # assign $PNAME to the actual program name
 # $script_path is the path to the directory the script is in
@@ -41,53 +36,50 @@ $PNAME = "$script_name$script_suffix";
 
 use vars qw($package);
 
-## Check command-line arguments
-if (@ARGV != 1) { 
-    print STDERR " Invalid number of command-line arguments.\n";
-    print STDERR " Usage: ${PNAME} <package>\n\n";
-    exit(0);
+
+#
+#
+# test script for the gnuplot package
+#
+#
+print "1..1\n";
+
+my @drivers = @t::Config::drivers;
+my $test_gnuplot = 0;
+
+for (@drivers) {
+   if ($_ eq "gnuplot") {
+	$test_gnuplot = 1;
+    }
 }
 
-$package = $ARGV[0];
-
-#
-#
-# test script for the graph package
-#
-#
-
-if ($package eq "gnuplot") {
-
-    gnuplot({"title" => "foo",
+if ($test_gnuplot) {
+    if (gnuplot({"title" => "foo",
 	     "x2-axis label" => "bar",
 	     "logscale x2" => "1",
 	     "logscale y" => "1",
-	     "xtics" => [ ["small\\nfoo", 10], ["medium\\nfoo", 20], ["large\\nfoo", 30]],
+	     "xtics" => [ ["small\\nfoo", 10], 
+			  ["medium\\nfoo", 20], 
+			  ["large\\nfoo", 30]],
 	     "ytics" => [10,20,30,40,50]},
 	    [{"title" => "data1",
-	      "type" => "matrix"}, [[1, 10], 
-				    [2, 20], 
-				    [3, 30]] ],
+	      "type" => "matrix"}, 
+	     [[1, 10], 
+	      [2, 20], 
+	      [3, 30]] ],
 	    [{"title" => "data2", 
 	      "style" => "lines",
-	      "type" => "columns"}, [8, 26, 50, 60, 70], 
+	      "type" => "columns"}, 
+	     [8, 26, 50, 60, 70], 
 	     [5, 28, 50, 60, 70] ],
 	    [{"title" => "data3",
 	      "style" => "lines",
-	      "type" => "file"}, "sample"],);
-
-
-} elsif ($package eq "xrt") { 
-
-
-    xrt({"x-ticks"=>["a", "b", "c"],
-	 "y-ticks"=>["w", "x", "y", "z"],},
-	[["10", "15", "23", "10"],
-	 ["4", "13", "35", "45"],
-	 ["29", "15", "64", "24"]]);
-
-#    xrt({},
-#	[["10", "15", "23", "10"],
-#	 ["4", "13", "35", "45"],
-#	 ["29", "15", "64", "24"]]);
+	      "type" => "file"}, 
+	     "sample"],)) {
+	print "ok\n";
+    } else {
+	print "not ok\n";
+    }
+} else {
+    print "ok\n";
 }

@@ -1,3 +1,18 @@
+1999-04-26  Michael Young  <mhyoung@ipn.caida.org>
+
+	* Graph.pm (\$xvfb):
+ 	1) made a working test suite
+	2) all distribution files are in place
+	3) many bugs have been fixed
+
+1999-04-19  Michael Young  <mhyoung@ipn.caida.org>
+
+	* Graph.pm :
+	1) fixed bug with $ENV{TMPDIR} being overwritten
+	2) split Graph.pm into Chart::Graph, Chart::Graph::Utils,
+	   Chart::Graph::Gnuplot, Chart::Graph::Xrt3d
+	3) fixed typos in documentation
+
 1999-04-05  Michael Young  <mhyoung@ipn.caida.org>
 
 	* Graph.pm : 

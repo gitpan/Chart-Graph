@@ -34,20 +34,22 @@
       <b>gnuplot()</b> is a function in module Chart::Graph that lets you generate graphs on the 
       fly in perl. It was written as a front-end application to gnuplot for hassle-free
       generation of graphs. <b>gnuplot()</b> can be supplied with many of the same 
-      options and arguments that can be given to gnuplot.
+      options and arguments that can be given to gnuplot. For more information on gnuplot 
+      please see <a href="http://www.cs.dartmouth.edu/gnuplot_info.html">
+      http://www.cs.dartmouth.edu/gnuplot_info.html.</a>
     </p>
 
 
     <hr>
     <h2><a name="Calling gnuplot()">Calling gnuplot()</a></h2>
     <pre>
-#make sure to include Graph.pm
-use Graph;
+#make sure to include Chart::Graph
+use Chart::Graph;
 
-gnuplot(\%global_options, \@data_sets);
+gnuplot(\%global_options, @data_sets);
 gnuplot(\%global_options, [\%data_set_options, \@matrix], 
                          [\%data_set_options, \@x_column, \@y_column],
-                         [\%data_set_options, &lt filename &gt], ...] );
+                         [\%data_set_options, &lt filename &gt], ... );
     </pre>
    
 
@@ -59,7 +61,7 @@ gnuplot(\%global_options, [\%data_set_options, \@matrix],
 	<tr><td><b>Name</b></td><td><b>Options</b></td><td><b>Default</b></td></tr>
 	<tr><td>"title"</td> <td>(set your own title)</td> <td>"untitled"</td></tr>
 	<tr><td>"output type"</td><td>"pbm" or "gif"</td><td>"gif"</td></tr>
-	<tr><td>"output file"</td><td>(set your own output file)</td><td>"gnuplot.gif"</td></tr>
+	<tr><td>"output file"</td><td>(set your own output file)</td><td>"untitled-gnuplot.gif"</td></tr>
 	<tr><td>"x-axis label"</td><td>(set your own label)</td><td>"x-axis"</td></tr>
 	<tr><td>"y-axis label"</td><td>(set your own label)</td><td>"y-axis"</td></tr>
 	<tr><td>"x2-axis label"</td><td>(set your own label)</td><td>none</td></tr>
@@ -93,7 +95,7 @@ gnuplot(\%global_options, [\%data_set_options, \@matrix],
     <h2><a name="Example">Example</a></h2>
     <p>
     <pre>
-  use Graph;
+  use Chart::Graph;
 
   gnuplot({"title" =&gt "foo",
          "x2-axis label" =&gt "bar",
@@ -113,7 +115,7 @@ gnuplot(\%global_options, [\%data_set_options, \@matrix],
           "style" =&gt "lines",
           "type" =&gt "file"}, "sample"],);
     </pre>
-    <IMG SRC="gnuplot.gif" ALT = "Graph of example">
+    <IMG SRC="untitled-gnuplot.gif" ALT = "Graph of example">
 
 
     <hr>
@@ -129,7 +131,7 @@ gnuplot(\%global_options, [\%data_set_options, \@matrix],
     <address><a href="mailto:mhyoung@caida.org">Michael Young</a></address>
 <!-- Created: Mon Nov  2 14:22:40 PST 1998 -->
 <!-- hhmts start -->
-Last modified: Mon Apr  5 14:24:41 PDT 1999
+Last modified: Fri Apr 23 21:29:47 PDT 1999
 <!-- hhmts end -->
   </body>
 </html>
