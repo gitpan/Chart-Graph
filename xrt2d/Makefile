@@ -2,25 +2,28 @@ RM = rm -f
 
 # Parameters.
 
-OBJECTS = xrt3d.o graph_3d.o
-PROGRAMS = graph_3d
+OBJECTS = xrt_2d.o graph_2d.o
+PROGRAMS = graph_2d
 
 # Compiler flags
 
 CPPFLAGS = -I$(XRTHOME)/include
+#CFLAGS   = -g  -Xc -dalign $(CPPFLAGS)
+#LDFLAGS = -L$(XRTHOME)/lib
 CC=gcc
 CPP=g++
 CFLAGS=-g -I/usr/X11R6/include -I/usr/openwin/include -I/usr/dt/include $(CPPFLAGS) 
 LDFLAGS = -L$(XRTHOME)/lib -L/usr/X11R6/lib -L/usr/openwin/lib -L/usr/dt/lib
-LDLIBS = -lxrt3d -lpdsutil -lXpm -lMrm -lXext -lXm -lXt -lX11 -lm 
+LDLIBS = -lxrtm -lpdsutil -lXpm -lXext -lMrm -lXm -lXt -lX11 -lm \
+
 .SUFFIXES: .cpp $(.SUFFIXES)
 
 # Standard targets
 
-all: graph_3d
+all: graph_2d
 
-graph_3d: xrt3d.o graph_3d.o
-	$(CC) $(CFLAGS) -o $@ graph_3d.o xrt3d.o $(LDFLAGS) $(LDLIBS)
+graph_2d: xrt_2d.o graph_2d.o
+	$(CC) $(CFLAGS) -o $@ graph_2d.o xrt_2d.o $(LDFLAGS) $(LDLIBS)
 	$(XRTHOME)/bin/xrt_auth $@
 
 clean:
@@ -35,4 +38,4 @@ clean:
 
 # Header dependencies
 
-xrt3d.o:	xrt3d.h
+xrt_2d.o:	xrt_2d.h

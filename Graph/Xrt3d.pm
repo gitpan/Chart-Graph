@@ -1,7 +1,7 @@
-## Gnuplot.pm is a sub-module of Graph.pm. It has all the subroutines 
-## needed for the gnuplot part of the package.
+## Xrt3d.pm is a sub-module of Graph.pm. It has all the subroutines 
+## needed for the Xrt3d part of the package.
 ##
-## $Id: Xrt3d.pm,v 1.7 1999/04/23 20:12:43 mhyoung Exp $ $Name: graph_RELEASE_1_1 $
+## $Id: Xrt3d.pm,v 1.26 2001/10/23 22:17:37 elagache Exp $ $Name:  $
 ##
 ## This software product is developed by Michael Young and David Moore,
 ## and copyrighted(C) 1998 by the University of California, San Diego
@@ -17,10 +17,28 @@
 ##
 ## You should have received a copy of the GNU GPL along with this program.
 ##
-## Contact: graph@caida.org
+##
+## IN NO EVENT SHALL THE UNIVERSITY OF CALIFORNIA BE LIABLE TO ANY
+## PARTY FOR DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
+## DAMAGES, INCLUDING LOST PROFITS, ARISING OUT OF THE USE OF THIS
+## SOFTWARE, EVEN IF THE UNIVERSITY OF CALIFORNIA HAS BEEN ADVISED OF
+## THE POSSIBILITY OF SUCH DAMAGE.
+##
+## THE SOFTWARE PROVIDED HEREIN IS ON AN "AS IS" BASIS, AND THE
+## UNIVERSITY OF CALIFORNIA HAS NO OBLIGATION TO PROVIDE MAINTENANCE,
+## SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS. THE UNIVERSITY
+## OF CALIFORNIA MAKES NO REPRESENTATIONS AND EXTENDS NO WARRANTIES
+## OF ANY KIND, EITHER IMPLIED OR EXPRESS, INCLUDING, BUT NOT LIMITED
+## TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A
+## PARTICULAR PURPOSE, OR THAT THE USE OF THE SOFTWARE WILL NOT INFRINGE
+## ANY PATENT, TRADEMARK OR OTHER RIGHTS.
+##
+##
+## Contact: graph-dev@caida.org
+##
 ##
 package Chart::Graph::Xrt3d;
-require Exporter;
+use Exporter ();
 
 @ISA = qw(Exporter);
 @EXPORT = qw();
@@ -28,13 +46,15 @@ require Exporter;
 
 use FileHandle;			# to create generic filehandles
 use Carp;			# for carp() and croak()
-use POSIX ":sys_wait_h";	# for waitpid()
 use Chart::Graph::Utils qw(:UTILS);	# get global subs and variables
+use Chart::Graph::XrtUtils qw(:UTILS);
 
-$cvs_Id = '$Id: Xrt3d.pm,v 1.7 1999/04/23 20:12:43 mhyoung Exp $';
-$cvs_Author = '$Author: mhyoung $';
-$cvs_Name = '$Name: graph_RELEASE_1_1 $';
-$cvs_Revision = '$Revision: 1.7 $';
+$cvs_Id = '$Id: Xrt3d.pm,v 1.26 2001/10/23 22:17:37 elagache Exp $';
+$cvs_Author = '$Author: elagache $';
+$cvs_Name = '$Name:  $';
+$cvs_Revision = '$Revision: 1.26 $';
+
+$VERSION = 2.0;
 
 use strict;
 
@@ -43,10 +63,11 @@ use strict;
 #
 
 
-my %def_xrt_global_opts;		# xrt spceific globals
+my %def_xrt_global_opts;		# xrt specific globals
 
 %def_xrt_global_opts = (
 			"output file" =>  "untitled-xrt3d.gif",
+			"output type" => "gif",
 			"x-axis title" => "x-axis",
 			"y-axis title" => "y-axis",
 			"z-axis title" => "z-axis",
@@ -70,23 +91,30 @@ my %def_xrt_global_opts;		# xrt spceific globals
 #
 
 sub xrt3d {
-    my ($user_global_opts_ref, $data_set_ref) = @_;
-    my (%global_opts,);
+    my $user_global_opts_ref = shift; 
+    my $data_set_ref = shift;
+	my $matrix_data_ref;
+	my $data_filename;
+    my (%global_opts);
     
     # variables to be written to the command file
     my ($plot_file, $x_axis, $y_axis, $z_axis, $x_step, $y_step);
     my ($x_min, $y_min, $x_ticks, $y_ticks, $header, $footer);
     my ($x_cnt, $y_cnt, $hdr_cnt, $ftr_cnt);
     my ($output_file);
-    
-    _make_tmpdir();
+
+    if (@_) {
+	carp 'Too many arguments. Usage: xrt3d(\%options, \@data_set)';
+	return 0;
+    }
+
+    _make_tmpdir("_Xrt3d_");
 
     # set paths for external programs
-    if (not _set_xrtpaths()) {
+    if (not _set_xrtpaths("xrt3d")) {
 	_cleanup_tmpdir();
 	return 0;
     }
-    
     
     # check first arg for hash
     if (ref($user_global_opts_ref) ne "HASH") {
@@ -101,13 +129,34 @@ sub xrt3d {
     # check for values in command file
     while (my ($key, $value) = each %global_opts) {
 	
-		if ($key eq "output file") {
-		    if(defined($value)) {
-			$output_file = $value;
-			$plot_file = _make_tmpfile("plot", "xwd");
-		    }
-		}
+	  if ($key eq "output file") {
+		$output_file = $value;
+		unless (defined $global_opts{"output type"}) {
+		    carp "Must have an output type defined";
+		    _cleanup_tmpdir();
+		    return 0;
+		  }
+	  }
 		
+	  # If the file is PostScript ... what XRT makes is PostScript
+	  if ($global_opts{"output type"} eq "ps") {
+		$plot_file = _make_tmpfile("plot", "ps");
+	  } 
+	  # For all raster formats XRT starts out with 
+	  # X-Windows XWD format.
+	  elsif (($global_opts{"output type"} eq "gif") or
+			 ($global_opts{"output type"} eq "xwd") or
+			 ($global_opts{"output type"} eq "png") or
+			 ($global_opts{"output type"} eq "jpg")
+			) {
+		$plot_file = _make_tmpfile("plot", "xwd");
+	  } else {
+		# Default is XWD
+		carp "Unknown output type, defaulting to xwd";
+		$plot_file = _make_tmpfile("plot", "xwd");
+	  }
+
+
 		if ($key eq "x-axis title") {
 		    if(defined($value)) {
 			$x_axis = $value;
@@ -147,7 +196,7 @@ sub xrt3d {
 		if ($key eq "y-step") {
 		    if(defined($value)) {
 			$y_step = $value;
-		    }
+	    }
 		}
 		
 		if ($key eq "x-ticks") {
@@ -173,46 +222,82 @@ sub xrt3d {
 			$footer = $value;
 		    }
 		}
-	    }
-    
-    # get the number of columns and number of rows
-    # and verify that each row has same number of 
-    # columns
-    
-    $x_cnt = $#{$data_set_ref} + 1;
-    my $tmp = $#{$data_set_ref->[0]} + 1;
-    
-    foreach my $i (@{$data_set_ref}) {
-	if ($tmp != $#{$i} + 1) {
-	    carp "each row must have the same number of columns";
-	    _cleanup_tmpdir();
-	    return 0;
-	} 
-    }
-    
-    $y_cnt = $tmp;
+	}
+	
+
+	# Extract options for data.
+	my $data_opts = shift @{$data_set_ref};
+	while (my ($key, $value) = each %{$data_opts}) {
+	  if ($key eq "type") {
+		if ($value eq "matrix") {
+		  $matrix_data_ref = $data_set_ref;
+		} 
+		elsif ($value eq "file") {
+		  $data_filename = pop @{$data_set_ref};
+		} else {
+		  carp "Unsupported or unknown format for data";
+		}
+	  }
+	}
     
     # because xrt allows multiline headers
     # get the length of the header array
     # each line of the header is one index
     # in the array
+
     $hdr_cnt = $#{$global_opts{"header"}} + 1;
     $ftr_cnt = $#{$global_opts{"footer"}} + 1;
     
-    # verify that number of tick marks == corresponds
-    # to that of xy matrix. One tick mark for every x
-    # y.
+
+	if (defined($matrix_data_ref)) {
+	  # get the number of columns and number of rows
+	  # and verify that each row has same number of 
+	  # columns
     
-    if (not _verify_ticks($x_cnt, $global_opts{"x-ticks"})) {
-	_cleanup_tmpdir();
-	return 0;
-    }
+	  $x_cnt = $#{$matrix_data_ref} + 1;
+	  my $tmp = $#{$matrix_data_ref->[0]} + 1;
     
-    if (not _verify_ticks($y_cnt, $global_opts{"y-ticks"})) {
-	_cleanup_tmpdir();
-	return 0;
-    }
+	  foreach my $i (@{$matrix_data_ref}) {
+		if ($tmp != $#{$i} + 1) {
+		  carp "each row must have the same number of columns";
+		  _cleanup_tmpdir();
+		  return 0;
+		} 
+	  }
     
+	  $y_cnt = $tmp;
+	  
+
+	  # verify that number of tick marks == corresponds
+	  # to that of xy matrix. One tick mark for every x
+	  # y.
+	  
+	  if (not _verify_ticks($x_cnt, $global_opts{"x-ticks"})) {
+		_cleanup_tmpdir();
+		return 0;
+	  }
+    
+	  if (not _verify_ticks($y_cnt, $global_opts{"y-ticks"})) {
+		_cleanup_tmpdir();
+		return 0;
+	  }
+    } else {
+	  # XXX
+	  # Poor man's hack to compute rows and columns in data file.  This will
+	  # make a second pass through file, but is probably faster than doing it
+	  # in Perl.  
+	  my ($lead, $words, $bytes);
+	  ($lead, $x_cnt, $words, $bytes)  = split(/\D+/, `wc $data_filename`);
+	  if (($x_cnt > 0) and ($words > 0)) {
+		$x_cnt++;
+		$y_cnt = $words/$x_cnt;
+	  } else {
+		$x_cnt = 0;
+		$y_cnt = 0;
+		carp "Cannot compute number of rows and/or columns in file data";
+	  }
+	}
+
     ##
     ## print command file using this format
     ##
@@ -264,7 +349,11 @@ sub xrt3d {
     print $handle "$y_step\n";
     print $handle "$x_cnt\n";
     print $handle "$y_cnt\n";
-    _print_matrix($handle, @{$data_set_ref});
+	if (defined($matrix_data_ref)) {
+	  _print_matrix($handle, @{$matrix_data_ref});
+	} else {
+	   _transfer_file($handle, $data_filename)
+	}
     print $handle "$hdr_cnt\n";
     _print_array($handle, @{$header});
     print $handle "$ftr_cnt\n";
@@ -277,272 +366,252 @@ sub xrt3d {
     $handle->close();
 
     # call xrt and convert file to gif
-    if (not _exec_xrt($command_file)) {
+    if (not _exec_xrt3d($command_file)) {
 	_cleanup_tmpdir();
 	return 0;
     }
-    
-    if(not _exec_xwdtogif($plot_file, $output_file)) {
-	_cleanup_tmpdir();
-	return 0;
-		}
+    my $graph_format = $global_opts{"output type"};
+    if ($graph_format eq "ps") {
+	  if (not _chk_status(system("cp $plot_file $output_file"))) {
+	    _cleanup_tmpdir();
+	    return 0;
+	  }
+    } elsif ($graph_format eq "xwd") {
+	  if (not _chk_status(system("cp $plot_file $output_file"))) {
+	    _cleanup_tmpdir();
+	    return 0;
+	  }
+	} else {
+	  if(not _convert_raster($graph_format, $plot_file, $output_file)) {
+	    _cleanup_tmpdir();
+	    return 0;
+	  }
+    }
+
     _cleanup_tmpdir();
     return 1;
 }
-
-# 
-# Subroutine: set_xrtpaths()
-# 
-# Description: set paths for external programs required by xrt()
-#              if they are not defined already
-#
-sub _set_xrtpaths {
-
-    if (not defined($ppmtogif)) {
-	if (not $ppmtogif = _get_path("ppmtogif")) {
-	    return 0;
-	}
-    }
-
-    if (not defined($xrt)) {
-	if (not $xrt = _get_path("xrt")) {
-	    return 0;
-	}
-    }
-
-    if (not defined($xwdtopnm)) {
-	if (!($xwdtopnm = _get_path("xwdtopnm"))) {
-	    return 0;
-	}
-    }
-
-    if (not defined($xvfb)) {
-	if (not $xvfb = _get_path("Xvfb")) {
-	    return 0;
-	}
-    }
-
-    # make sure /usr/dt/lib is in the library path
-    _set_ldpath("/usr/dt/lib");
-
-    return 1;
-}
-
-#
-# Subroutine: set_ldpath()
-#
-# Description: Xvfb has trouble finding libMrm, so we have to add
-#              /usr/dt/lib to LD_LIBRARY_PATH
-#
-
-sub _set_ldpath {
-    my ($libpath) = @_;
-    
-    if (not defined($ENV{LD_LIBRARY_PATH})) {
-	$ENV{LD_LIBRARY_PATH} = "$libpath";
-	return 1;
-    }
-
-    my @ldpath = split (/:/, $ENV{LD_LIBRARY_PATH});
-
-    # make sure library path isn't already defined
-    foreach my $i(@ldpath){
-	if ($i eq $libpath) {
-	    return 1;
-	}
-    }
-
-    # add library path to LD_LIBRARY_PATH
-    $ENV{LD_LIBRARY_PATH} = "$libpath:$ENV{LD_LIBRARY_PATH}";
-    return 1;
-}
-
-# 
-# Subroutine: print_matrix() 
-# 
-# Description: print out all the elements 
-#              in a X by Y  matrix, row by row
-#
-
-sub _print_matrix {
-    my ($handle, @matrix) = @_;
-    
-    foreach my $row (@matrix){
-	foreach my $i (@{$row}){
-	    print $handle "$i ";
-	}
-	print $handle "\n";
-    }
-    return 1;
-}
-# 
-# Subroutine: print_array()
-# 
-# Description:  print out each element of array, one per line
-#
-
-sub _print_array {
-    my ($handle, @array) = @_;
-    my $i;
-    
-    foreach $i (@array) {
-	print $handle "$i\n";
-    }
-    return 1;
-}
-
-# 
-# Subroutine: verify_ticks();
-#   
-# Description: check that the number of tick labels is the same
-#              as the number of xy rows and columns. we can only have
-#              as many ticks as the number of rows or columns
-#              we make this subroutine so that the calling subroutine
-#              is kept cleaner.
-
-sub _verify_ticks {
-    my ($cnt, $ticks_ref) = @_;
-
-    # if no ticks are given then just
-    # give the xrt binary "1, 2,..."
-    if (not defined($ticks_ref)) {
-	my @def_ticks;
-	for (my $i = 0; $i < $cnt; $i++) {
-	    $def_ticks[$i] = $i + 1;
-        }
-	$ticks_ref = \@def_ticks;
-    }
-
-    my $tick_cnt = @{$ticks_ref};
-
-    if ($cnt ne $tick_cnt){
-	carp "number of tick labels must equal the number of xy rows and columns";
-	return 0;
-    }
-    return 1;
-}
-
-# 
-# Subroutine: exec_xrt()
-#
-# Description: execute the xrt program on the command file.
-#              xrt generates a xwd file.
-# 
-sub _exec_xrt {
-    my ($command_file) = @_;
-    my ($output);
-    
-    # start the virtual X server
-    my ($childpid, $port) = _exec_xvfb();
-    
-    my $status = system("$xrt -display :$port.0 < $command_file");
-    if (not _chk_status($status)) {
-	return 0;
-    }
-
-    kill('KILL', $childpid);
-    return 1;
-}
-	
-# 
-# Subroutine: exec_xwdtogif 
-# 
-# Description: convert the xwd file generated by xrt into a gif
-#              this is a 2-step process. the xwd must be converted into 
-#              a pnm and then into a gif.
-sub _exec_xwdtogif {
-    my ($xwd_file, $gif_file) = @_;
-    my ($status);
-    
-    if ($debug) {
-	$status = system("$xwdtopnm $xwd_file | $ppmtogif > $gif_file");
-    } else {
-	$status = system("( $xwdtopnm $xwd_file | $ppmtogif > $gif_file; ) 2> /dev/null");
-    }
-    
-    if (not _chk_status($status)) {
-	return 0;
-    }
-    return 1;
-}
-
-# 
-# Subroutine: exec_xvfb()
-#
-# Description:  this starts the vitualX server(X is required by xrt, so 
-#               we fake out xrt with Xvfb, for speed and compatability)
-#
-#
-sub _exec_xvfb {
-    my $port = 99;
-    my $childpid;
-    my $sleep_time = 1;
-
-    # starting with port 100, we try to start
-    # the virtual server until we find an open port
-    # because of the nature of the virtual x server
-    # we use, in order to know if we have found an 
-    # open port, we have to sleep.
-    # we check the pid of the virtual x process we started
-    # and see if it died or not.
-    while (_childpid_dead($childpid)) {
-	$port++;
-	$childpid = _try_port($port);
-	sleep($sleep_time);
-    }
-
-    # save the childpid so we can stop the virtual server later
-    # save the $port so we can tell xrt where the virtual server is.
-    return ($childpid, $port);
-}
-# 
-# Subroutine: try_port();
-#
-# Description:  will try to start Xvfb on specified port
-sub _try_port {
-
-    my ($port) = @_;
-    my ($childpid);
-    
-    #fork a process
-    if (not defined($childpid = fork())){
-	# the fork failed
-	carp "cannot fork: $!";
-	return 0;
-    } elsif ($childpid == 0) {
-	# we are in the child process
-	if ($debug) {
-	    exec "$xvfb :$port";
-	}
-	else {
-	    exec "exec $xvfb :$port 2> /dev/null";
-	}
-    } else {
-	# we are in the parent, return the childpid
-	# so re can kill it later.
-	return $childpid;
-    }
-    
-}
-
-# 
-# Subroutine: childpid_dead
-# 
-# Description: check to see if a PID has died or not
-#
-#
-sub _childpid_dead {
-    my ($childpid) = @_;
-    
-    if (not defined($childpid)) {
-	return 1;
-    }
-
-    # WNOHANG: waitpid() will not suspend execution  of
-    # the  calling  process  if  status is not
-    # immediately available  for  one  of  the
-    #  child processes specified by pid.
-    return waitpid($childpid, &WNOHANG);
-}
-
+ 
 1;
+
+
+__END__
+
+=head1 NAME
+
+Chart::Graph::Xrt3d
+
+=head1 SYNOPSIS
+
+ #Include module
+ use Chart::Graph::Xrt3d qw(xrt3d);
+
+ # Function call
+ xrt3d(\%options,
+       \@data_set
+      );
+
+
+=head1 DESCRIPTION
+
+Sitraka makes a number of graphics packages for UNIX systems.  XRT is
+a Motif-based commercial software product that has been adapted by
+CAIDA using a combination of C drivers and Perl function I<xrt3d()>.
+The Perl function I<xrt3d()> provides access to the three dimensional
+graphing capabilities of XRT from Perl.  To access the two dimensional
+graphing using XRT, use I<xrt2d()> also supplied in the
+I<Chart::Graph> package.
+
+=head1 ARGUMENTS
+
+The options to I<xrt3d()> are listed below.  Additional control over the
+resulting graph is possible by using the XRT application itself once
+the graph has been created.
+
+ +--------------------------------------------------------------------------+
+ |                                OPTIONS                                   |
+ +----------------+--------------------------+------------------------------+
+ | Name           |  Options                 | Default                      |
+ |"output file"   |  (set your own)          | "untitled-xrt3d.gif"         |
+ |"output type"   |  "ps","xwd", "png", "jpg"| "xwd"                        |
+ |"x-axis title"  |  (set your own)          | "x-axis"                     |
+ |"y-axis title"  |  (set your own)          | "y-axis"                     |
+ |"z-axis title"  |  (set your own)          | "z-axis"                     |
+ |"x-min"         |  "0" or "1"(normally 0)  | "0"                          |
+ |"y-min"         |  "0" or "1"(normally 0)  | "0"                          |
+ |"x-step"        |  "0" or "1"(normally 1)  | "1"                          |
+ |"y-step"        |  "0" or "1"(normally 1)  | "1"                          |
+ |"x-ticks"       |  (set your own)          | none                         |
+ |"y-ticks"       |  (set your own)          | none                         |
+ |"header"        |  (set your own)          | Array ref of "header" text   |
+ |"footer"        |  (set your own)          | Array ref of "footer" text   |
+ +----------------+--------------------------+------------------------------+
+
+The I<xrt3d> function only accepts data in one of two forms.  The
+choices are: either C<[\%data1_opts, \@data_matrix]> or
+C<[\%data1_opts, "filename"]> The data options are listed below.
+
+ +--------------------------------------------------------------------------+
+ |                             DATA OPTIONS                                 |
+ +----------------+--------------------------+------------------------------+
+ | Name           |  Options                 | Default                      |
+ +----------------+--------------------------+------------------------------+
+ | "type"         | Data format: "matrix" or | none                         |
+ |                | "file"                   |                              |
+ +----------------+--------------------------+------------------------------+
+
+=head2 DETAILS ON GRAPHICS CONVERTER OPTIONS
+
+The xrt package supports only two graphics formats internally:
+Postscript and the X windows format XWD.  Additional raster graphics
+formats are supported with Chart::Graph by using one of two graphics
+converter packages: I<Imagemagick> and I<Netpbm>.
+
+If you need to install a converter package,I<Imagemagick> 
+I<http://www.imagemagick.org/> is probably preferable
+simply for its comparatively simplicity.  It uses one program
+I<convert> for all of it's conversion needs, so it is easy to manage
+and simple for Chart::Graph to use.  Many UNIX systems come with some
+collection of the I<Netpbm> utilities already installed, thus users
+may be able to start using Chart::Graph without adding any additional
+converters.  Alas, it is unlikely any distributions would include all
+the converters for the newest graphics formats used by Chart::Graph.
+In that case it may still preferable to use I<Imagemagick> simply for
+the sake of avoiding installing over 80 utilities that come with
+current distributions of I<Netpbm>.  For more information on the
+current distribution of I<Netpbm> go to the current website at:
+I<http://netpbm.sourceforge.net/>
+
+The xrt package also allows for multiple header and footers with each
+graph.  As a result, instead of just the usual string, an array
+reference containing the multiple strings for the header and footer
+text.
+
+=head1 EXAMPLES
+
+The following four examples show Chart::Graph::Xrt3d in different roles
+and producing different styles of output.
+
+=head2 EXAMPLE: STOCK PRICES FOR JOE'S RESTAURANT
+
+The first example creates a three dimensional bar chart of
+fictitious stock data that is displayed in the graphic file
+F<xrt3d-1.gif>.  Note that I<xrt3d()> uses the older gif file format,
+but can use others as noted above if you have the available converters
+provided.
+
+ #make sure to include Chart::Graph
+ use Chart::Graph::Xrt3d qw(xrt3d);
+
+ #using a 3 by 6 matrix for the data set
+ xrt3d({"output file" => "xrt3d-1.gif",
+			   "output type" => "gif",
+				   "header" => 
+			   ["Stock prices for Joe's restaurant chain",
+				"Compiled from local records"
+				],
+			   "footer" =>
+			   ["Joe's Restaurant"],
+			   "y-ticks"=>["Jan/Feb", "Mar/Apr", "May/Jun", "Jul/Aug",
+						   "Sep/Oct", "Nov/Dec"],
+			   "x-axis title" => "Years monitored",
+			   "y-axis title" => "Month's tracked",
+			   "z-axis title" => "Stock prices",
+			  },
+			  [{"type" => "matrix"},
+               ["4", "5", "3", "6", "6", "5"],
+			   ["8", "13", "20", "45", "100", "110" ],
+			   ["70", "45", "10", "5", "4", "3"]])
+
+=for html
+<p><center><img src="xrt3d-1.jpg"></center></p>
+<p><center><em>xrt3d-1.jpg</em></center></p>
+
+=head2 EXAMPLE: EARLY GROWTH OF THE INTERNET
+
+The following example creates a three dimensional bar chart of data
+collected on the early growth of the Internet (URL and corporate
+source included on graph.)  The result in this case is display in one
+of the newest graphics formats the PNG format: F<xrt3d-2.png>.
+
+ #make sure to include Chart::Graph
+ use Chart::Graph::Xrt3d qw(xrt3d);
+
+  xrt3d({"output file" => "xrt3d-2.png",
+         "output type" => "png",
+	 "header" => 
+	 ["Growth of Early Internet", 
+	 "(according to Internet Wizards - http://www.nw.com/)",
+	 ],
+	 "footer" =>
+	 ["http://www.mit.edu/people/mkgray/net/internet-growth-raw-data.html"],
+	 "y-ticks"=>["Jan 93", "Apr 93", "Jul 93",
+		     "Oct 93", "Jan 94", "Jul 94",
+		     "Oct 94", "Jan 95", "Jul 95",
+		     "Jan 96"
+		    ],
+	 "x-ticks"=>["Hosts", "Domains", "Replied to Ping"],},
+	 [{"type" => "matrix"},
+      ["1.3e6", "1.5e6", "1.8e6", "2.1e6", "2.2e6", "3.2e6", 
+	   "3.9e6","4.9e6", "6.6e6", "9.5e6"
+	  ],
+	  ["21000","22000", "26000", "28000", "30000", "46000", 
+	   "56000", "71000", "120000", "240000"
+	  ],
+	  ["NA", "0.4e6", "NA", "0.5e6", "0.6e6", "0.7e6", 
+	   "1.0e6", "1.0e6", "1.1e6", "1.7e6" 
+	  ]
+	 ]
+        );
+
+=for html
+<p><center><img src="xrt3d-2.png"></center></p>
+<p><center><em>xrt3d-2.png</em></center></p>
+
+=head2 EXAMPLE: USING A DATA FILE FOR INPUT
+
+The next example uses a file instead of a array for it's data source.
+The file is listed below the Perl code.
+
+ #make sure to include Chart::Graph
+ use Chart::Graph::Xrt3d qw(xrt3d);
+
+    if (xrt3d({"output file" => "xrt3d-3.gif",
+               "output type" => "gif",
+               "x-ticks"=>["a", "b", "c"],
+	       "y-ticks"=>["w", "x", "y", "z"],},
+	    [{"type" => "file"},
+		 "xrt3d_data.txt"])) {
+	print "ok\n";
+    } else {
+	print "not ok\n";
+    }
+
+The data file used in the above example is as follows.
+
+ 10 15 23  10
+ 4 13 35 45
+ 29 15 64 24
+
+=for html
+<p><center><img src="xrt3d-3.gif"></center></p>
+<p><center><em>xrt3d-3.gif</em></center></p>
+
+
+=head1 MORE INFO
+
+For more information on XRT, please contact Sitraka:
+
+ http://www.sitraka.com
+
+=head1 CONTACT
+
+Send email to graph-dev@caida.org is you have problems, questions,
+or comments. To subscribe to the mailing list send mail to
+graph-dev-request@caida.org with a body of "subscribe your@email.com"
+
+=head1 AUTHOR
+
+ CAIDA Perl development team (cpan@caida.org)
+
+=cut

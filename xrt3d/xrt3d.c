@@ -29,7 +29,15 @@ static void dump_output(const char * dump_file, Widget graph)
 	
     fp = fopen(dump_file, "w");
     if (fp) {
-	Xrt3dOutputXwd(graph, fp, NULL);
+	if (strstr(dump_file, ".ps")) {
+	    Xrt3dDrawPS(graph, fp, NULL, True, 8.5, 11.0, 0.25, False, 0, 0, 0,
+		0, NULL, NULL, NULL, True, XRT3D_PS_COLOR_AUTO, True);
+	} else {
+	    if (!strstr(dump_file, ".xwd")) {
+		puts("Warning, unknown file extension, outputting XWD format.");
+	    }
+	    Xrt3dOutputXwd(graph, fp, NULL);
+	}
 	fclose(fp);
     }
 }
