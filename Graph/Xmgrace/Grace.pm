@@ -36,7 +36,7 @@
 ##
 ##
 
-$VERSION = 2.0;
+$VERSION = 3.0;
 
 package Chart::Graph::Xmgrace::Grace;
 use Chart::Graph::Xmgrace::Graph_Options;

@@ -1,7 +1,7 @@
 ## Graph.pm is a graphing package that supports on-the-fly graphing 
 ## from the gnuplot, xrt, and xmgrace  graphing packages.
 ##
-## $Id: Utils.pm,v 1.21 2001/10/06 00:48:19 elagache Exp $ $Name:  $
+## $Id: Utils.pm,v 1.22 2006/04/18 17:56:48 emile Exp $ $Name:  $
 ##
 ## This software product is developed by Michael Young and David Moore,
 ## and copyrighted(C) 1998 by the University of California, San Diego
@@ -61,12 +61,12 @@ Exporter::export_ok_tags('UTILS');
 use Carp;			# for carp() and croak()
 use File::Path;	                # for rmtree()
 
-$cvs_Id = '$Id: Utils.pm,v 1.21 2001/10/06 00:48:19 elagache Exp $';
-$cvs_Author = '$Author: elagache $';
+$cvs_Id = '$Id: Utils.pm,v 1.22 2006/04/18 17:56:48 emile Exp $';
+$cvs_Author = '$Author: emile $';
 $cvs_Name = '$Name:  $';
-$cvs_Revision = '$Revision: 1.21 $';
+$cvs_Revision = '$Revision: 1.22 $';
 
-$VERSION = 2.0;
+$VERSION = 3.0;
 
 use strict;
 
@@ -249,7 +249,7 @@ sub _mesh_opts {
     # the default options against the ones that
     # the user has passed in. 
     while (my ($key, $value) = each %default_opts) {
-	if (defined($user_opts{$key})) {
+	if (exists($user_opts{$key})) {
 	  $opts{$key} = $user_opts{$key};
 	  delete $user_opts{$key}; # remove options 
 	  # that are matching

@@ -1,7 +1,7 @@
 ## Xrt2d.pm is a sub-module of Graph.pm. It has all the subroutines 
 ## needed for the Xrt2d part of the package.
 ##
-## $Id: Xrt2d.pm,v 1.22 2001/10/23 22:17:37 elagache Exp $ $Name:  $
+## $Id: Xrt2d.pm,v 1.23 2006/04/18 17:56:48 emile Exp $ $Name:  $
 ##
 ## This software product is developed by Michael Young and David Moore,
 ## and copyrighted(C) 1998 by the University of California, San Diego
@@ -50,12 +50,12 @@ use Carp;			# for carp() and croak()
 use Chart::Graph::Utils qw(:UTILS);	# get global subs and variables
 use Chart::Graph::XrtUtils qw(:UTILS); # get Xrt subroutines
 
-$cvs_Id = '$Id: Xrt2d.pm,v 1.22 2001/10/23 22:17:37 elagache Exp $';
-$cvs_Author = '$Author: elagache $';
+$cvs_Id = '$Id: Xrt2d.pm,v 1.23 2006/04/18 17:56:48 emile Exp $';
+$cvs_Author = '$Author: emile $';
 $cvs_Name = '$Name:  $';
-$cvs_Revision = '$Revision: 1.22 $';
+$cvs_Revision = '$Revision: 1.23 $';
 
-$VERSION = 2.0;
+$VERSION = 3.0;
 
 use strict;
 
@@ -689,7 +689,10 @@ Chart::Graph::Xrt2d
 
 =head1 DESCRIPTION
 
-Sitraka makes a number of graphics packages for UNIX systems.  XRT is
+This module is unmaintained, it worked with Sitraka's XRT, and hasn't been
+tested against newer versions.
+
+Sitraka (now Quest) makes a number of graphics packages for UNIX systems.  XRT is
 a Motif-based commercial software product that has been adapted by
 CAIDA using a combination of C drivers and Perl function I<xrt2d()>.
 The Perl function I<xrt2d()> provides access to the two dimensional
@@ -837,9 +840,9 @@ unpredicable results.
 
 =head1 MORE INFO
 
-For more information on XRT, please contact Sitraka:
+For more information on XRT:
 
- http://www.sitraka.com
+ http://www.quest.com/xrt_pds/
 
 =head1 CONTACT
 

@@ -1,3 +1,11 @@
+2006-06-01  CAIDA Perl development team  <cpan@caida.org>
+	* All modules
+	1) general update of documentation
+	* Graph/Gnuplot.pm
+	1) Fixed bug in png output for newer versions of gnuplot
+	2) Added SVG support 
+	3) Output to STDOUT by setting 'output file' to undef
+
 2001-10-24  CAIDA Perl development team  <cpan@caida.org>
 	
 	* All modules

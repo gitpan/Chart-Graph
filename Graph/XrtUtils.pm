@@ -1,7 +1,7 @@
 ## XrtUtils.pm is a sub-module of Graph.pm. It has all the subroutines 
 ## needed for the Xrt3d part of the package.
 ##
-## $Id: XrtUtils.pm,v 1.10 2001/10/06 00:48:19 elagache Exp $ $Name:  $
+## $Id: XrtUtils.pm,v 1.11 2006/04/18 17:56:48 emile Exp $ $Name:  $
 ##
 ## This software product is developed by Michael Young and David Moore,
 ## and copyrighted(C) 1998 by the University of California, San Diego
@@ -54,12 +54,12 @@ use Carp;
 use POSIX ":sys_wait_h";	# for waitpid()
 use Chart::Graph::Utils qw(:UTILS); 
 
-$cvs_Id = '$Id: XrtUtils.pm,v 1.10 2001/10/06 00:48:19 elagache Exp $';
-$cvs_Author = '$Author: elagache $';
+$cvs_Id = '$Id: XrtUtils.pm,v 1.11 2006/04/18 17:56:48 emile Exp $';
+$cvs_Author = '$Author: emile $';
 $cvs_Name = '$Name:  $';
-$cvs_Revision = '$Revision: 1.10 $';
+$cvs_Revision = '$Revision: 1.11 $';
 
-$VERSION = 2.0;
+$VERSION = 3.0;
 
 use strict;
 use File::Basename;

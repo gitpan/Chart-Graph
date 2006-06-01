@@ -51,6 +51,19 @@ package t::Config;
 
 close CONFIG;
 
+### add extra target(s) to makefile
+sub MY::postamble {
+             return <<'MAKE_DOC';
+docs: Graph.pm
+	pod2html --infile=Graph.pm --outfile=Graph.html --title='Chart::Graph' \
+	&& pod2html --infile=Graph/Gnuplot.pm --outfile=doc/graph_gnuplot.html --title='Chart::Graph::Gnuplot' \
+	&& pod2html --infile=Graph/Xmgrace.pm --outfile=doc/graph_xmgrace.html --title='Chart::Graph::Xmgrace' \
+	&& pod2html --infile=Graph/Xrt2d.pm   --outfile=doc/graph_xrt2d.html   --title='Chart::Graph::Xrt2d' \
+	&& pod2html --infile=Graph/Xrt3d.pm   --outfile=doc/graph_xrt3d.html   --title='Chart::Graph::Xrt3d' \
+MAKE_DOC
+}
+
+
 WriteMakefile(
 	      'NAME'      => 'Chart::Graph',
 	      'VERSION_FROM' => 'Graph.pm', # finds $VERSION

@@ -1,160 +1,180 @@
-<HTML>
-<HEAD>
-<TITLE>Gnuplot.pm</TITLE>
-<LINK REV="made" HREF="mailto:bmwt@lib1.caida.org">
-</HEAD>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Chart::Graph::Gnuplot</title>
+<link rev="made" href="mailto:root@gohan24.freebsd.org" />
+</head>
 
-<BODY>
+<body style="background-color: white">
 
-<A NAME="__index__"></A>
+<p><a name="__index__"></a></p>
 <!-- INDEX BEGIN -->
 
-<UL>
+<ul>
 
-	<LI><A HREF="#name">NAME</A></LI>
-	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
-	<LI><A HREF="#description">DESCRIPTION</A></LI>
-	<LI><A HREF="#options">OPTIONS</A></LI>
-	<UL>
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#options">OPTIONS</a></li>
+	<ul>
 
-		<LI><A HREF="#using gnuplot to read and plot date/time data directly">USING GNUPLOT TO READ AND PLOT DATE/TIME DATA DIRECTLY</A></LI>
-	</UL>
+		<li><a href="#using_gnuplot_to_read_and_plot_date_time_data_directly">USING GNUPLOT TO READ AND PLOT DATE/TIME DATA DIRECTLY</a></li>
+	</ul>
 
-	<LI><A HREF="#notes on graphic file formats">NOTES ON GRAPHIC FILE FORMATS</A></LI>
-	<LI><A HREF="#examples">EXAMPLES</A></LI>
-	<UL>
+	<li><a href="#examples">EXAMPLES</a></li>
+	<ul>
 
-		<LI><A HREF="#general example">GENERAL EXAMPLE</A></LI>
-		<LI><A HREF="#errorbars">ERRORBARS</A></LI>
-		<LI><A HREF="#plotting dates  custom gnuplot options">PLOTTING DATES - CUSTOM GNUPLOT OPTIONS</A></LI>
-		<LI><A HREF="#unix time stamps">UNIX TIME STAMPS</A></LI>
-	</UL>
+		<li><a href="#general_example">GENERAL EXAMPLE</a></li>
+		<li><a href="#errorbars">ERRORBARS</a></li>
+		<li><a href="#plotting_dates__custom_gnuplot_options">PLOTTING DATES - CUSTOM GNUPLOT OPTIONS</a></li>
+		<li><a href="#unix_timestamps">UNIX TIMESTAMPS</a></li>
+		<li><a href="#functions">FUNCTIONS</a></li>
+	</ul>
 
-	<LI><A HREF="#more info">MORE INFO</A></LI>
-	<LI><A HREF="#contact">CONTACT</A></LI>
-	<LI><A HREF="#author">AUTHOR</A></LI>
-	<LI><A HREF="#see also">SEE ALSO</A></LI>
-</UL>
+	<li><a href="#more_info">MORE INFO</a></li>
+	<li><a href="#contact">CONTACT</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
 <!-- INDEX END -->
 
-<HR>
-<P>
-<H1><A NAME="name">NAME</A></H1>
-<P>Chart::Graph::Gnuplot</P>
-<P>
-<HR>
-<H1><A NAME="synopsis">SYNOPSIS</A></H1>
-<PRE>
-    use Chart::Graph::Gnuplot qw(&amp;gnuplot);</PRE>
-<PRE>
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Chart::Graph::Gnuplot</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    use Chart::Graph::Gnuplot qw(&amp;gnuplot);</pre>
+<pre>
  gnuplot(\%global_options, [\%data_set_options, \@matrix],
                            [\%data_set_options, \@x_column, \@y_column],
-                           [\%data_set_options, &lt; filename &gt;], ... );</PRE>
-<P>
-<HR>
-<H1><A NAME="description">DESCRIPTION</A></H1>
-<P><EM>gnuplot()</EM> is a function in module Chart::Graph that lets you
+                           [\%data_set_options, &lt; filename &gt;], ... );</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p><em>gnuplot()</em> is a function in module Chart::Graph that lets you
 generate graphs on the fly in perl. It was written as a front-end
 application to gnuplot for hassle-free generation of
-graphs. <EM>gnuplot()</EM> can be supplied with many of the same options and
+graphs. <em>gnuplot()</em> can be supplied with many of the same options and
 arguments that can be given to gnuplot. For more information on
-<EM>gnuplot</EM> see the end of this section.</P>
-<P>
-<HR>
-<H1><A NAME="options">OPTIONS</A></H1>
-<P><EM>gnuplot()</EM> has a very large number of options corresponding to
+<em>gnuplot</em> see the end of this section.</p>
+<p>
+</p>
+<hr />
+<h1><a name="options">OPTIONS</a></h1>
+<p><em>gnuplot()</em> has a very large number of options corresponding to
 options available with the gnuplot application itself.  This Perl
 wrapper provides a large subset of the functionality of the
-application.</P>
-<PRE>
+application.</p>
+<pre>
  +----------------------------------------------------------------------------+
  |                             GLOBAL OPTIONS:                                |
  +----------------+-----------------------------+-----------------------------+
  | NAME           |  OPTIONS                    |        DEFAULT              |
  +----------------+-----------------------------+-----------------------------+
- |&quot;title&quot;         |  (set your own title)       |     &quot;untitled&quot;              |
- |&quot;output type&quot;   |  &quot;pbm&quot; &quot;gif&quot; or &quot;png&quot;       |     &quot;png&quot;                   |
- |&quot;output file&quot;   |  (set your own output file) |     &quot;untitled-gnuplot.png&quot;  |
- |&quot;x-axis label&quot;  |  (set your own label)       |     &quot;x-axis&quot;                |
- |&quot;y-axis label&quot;  |  (set your own label)       |     &quot;y-axis&quot;                |
- |&quot;x2-axis label&quot; |  (set your own label)       |     none                    |
- |&quot;y2-axis label&quot; |  (set your own label)       |     none                    |
- |&quot;logscale x&quot;    |  &quot;0&quot; or &quot;1&quot;                 |     &quot;0&quot;                     |
- |&quot;logscale y&quot;    |  &quot;0&quot; or &quot;1&quot;                 |     &quot;0&quot;                     |
- |&quot;logscale x2&quot;   |  &quot;0&quot; or &quot;1&quot;                 |     &quot;0&quot;                     |
- |&quot;logscale y2&quot;   |  &quot;0&quot; or &quot;1&quot;                 |     &quot;0&quot;                     |
+ |'title'         |  set your own title         |     'untitled'              |
+ |'output type'   |  'pbm','gif','tgif','png',  |     'png'                   |
+ |                |   'svg' or &quot;eps $epsoptions&quot;|                             |
+ |'output file'   |  set your own output file,  |     'untitled-gnuplot.png'  |
+ |                |   undef to output to STDOUT |                             |
+ |'x-axis label'  |  set your own label         |     'x-axis'                |
+ |'y-axis label'  |  set your own label         |     'y-axis'                |
+ |'x2-axis label' |  set your own label         |     none                    |
+ |'y2-axis label' |  set your own label         |     none                    |
+ |'logscale x'    |  0 or 1                     |     0                       |
+ |'logscale y'    |  0 or 1                     |     0                       |
+ |'logscale x2'   |  0 or 1                     |     0                       |
+ |'logscale y2'   |  0 or 1                     |     0                       |
+ | 'xtics'        | set your own tics on x-axis |     none                    |
+ |                |   (see example below)       |                             |
+ | 'x2tics'       | set your own tics on x2-axis|     none                    |
+ |                |   (see example below)       |                             |
+ | 'ytics'        | set your own tics on y-axis |     none                    |
+ |                |   (see example below)       |                             |
+ | 'y2tics'       | set your own tics on y2-axis|     none                    |
+ |                |   (see example below)       |                             |
+ | 'xrange'       | set xrange, accepts both    |     none                    |
+ |                |  string '[$xmin:$xmax]'     |                             |
+ |                |  or arrayref [$xmin,$xmax]  |                             |
+ | 'yrange'       | set yrange, see xrange      |     none                    |
  |                |                             |                             |
- | &quot;xtics&quot;        | (set your own tics, see     |     none                    |
- |                |   example below)            |                             |
- | &quot;x2tics&quot;       | (set your own tics, see     |     none                    |
- |                |   example below)            |                             |
- | &quot;ytics&quot;        | (set your own tics, see     |     none                    |
- |                |   example below)            |                             |
- | &quot;y2tics&quot;       | (set your own tics, see     |     none                    |
- |                |    example below)           |                             |
- | &quot;xrange&quot;       | (set your own range)        |     &quot;[{&lt;xmin&gt; : &lt;xmax&gt;}]&quot;   |
- | &quot;yrange&quot;       | (set your own range)        |     &quot;[{&lt;ymin&gt; : &lt;ymax&gt;}]&quot;   |
- | &quot;uts&quot;          | (set your own range in      |     none                    |
- |                |  unix timestamps)           |                             |
- | &quot;xdata&quot;        | &quot;time&quot; to indicate that     |     none                    |
- |                | x-axis is date/time data    |                             |
- | &quot;ydata&quot;        | &quot;time&quot; to indicate that     |     none                    |
- |                | y-axis is date/time data    |                             |
- | &quot;x2data&quot;       | &quot;time&quot; to indicate that     |     none                    |
- |                | x2-axis is date/time data   |                             |
- | &quot;y2data&quot;       | &quot;time&quot; to indicate that     |     none                    |
- |                | y2-axis is date/time data   |                             |
- | &quot;timefmt&quot;      | &quot;Input date/time string&quot;    |     none                    |
- |                | see Gnuplot manual for info |                             |
- | &quot;format&quot;       | array ref: First element is |                             |
- |                | axis: x, y, x2, y2. Second  |                             |
- |                | element is                  |                             |
- |                | &quot;output date/time string&quot;   |                             |
- |                | see Gnuplot manual for info |                             |
- | &quot;extra_opts&quot;   | (set your own gnuplot       |     none                    |
- |                |  options separated by '\n') |                             |
- +----------------+-----------------------------+-----------------------------+</PRE>
-<PRE>
+ | 'uts'          | set your own range in unix  |     none                    |
+ |                |  timestamps, array ref:     |                             |
+ |                |  [start_ts,end_ts,&lt;scale&gt;,  |                             |
+ |                |   &lt;use_local_tz&gt; ]          |                             |
+ |                |  see UNIX TIMESTAMPS example|                             |
+ | 'xdata'        | 'time' to indicate that     |     none                    |
+ |                |  x-axis is date/time data   |                             |
+ | 'ydata'        | 'time' to indicate that     |     none                    |
+ |                |  y-axis is date/time data   |                             |
+ | 'x2data'       | 'time' to indicate that     |     none                    |
+ |                |  x2-axis is date/time data  |                             |
+ | 'y2data'       | 'time' to indicate that     |     none                    |
+ |                |  y2-axis is date/time data  |                             |
+ | 'timefmt'      | &quot;Input date/time string&quot;    |     none                    |
+ |                |  see Gnuplot manual for info|                             |
+ | 'format'       | array ref: First element is |                             |
+ |                |  axis: 'x', 'y', 'x2', 'y2'.|                             |
+ |                |  Second element is          |                             |
+ |                |  'output date/time string&quot;  |                             |
+ |                |  see Gnuplot manual for info|                             |
+ | 'extra_opts'   | set your own Gnuplot        |     none                    |
+ |                |  options, either an arrayref|                             |
+ |                |  or string (&quot;\n&quot;-separated) |                             |
+ | 'size'         | scale the display size of   |     none                    |
+ |                |  the plot, arrayref [$x, $y]|                             |
+ +----------------+-----------------------------+-----------------------------+</pre>
+<pre>
  +----------------------------------------------------------------------------+
  |                       Data Set Options:                                    |
  +----------------+-----------------------------+-----------------------------+
  |      Name      |          Options            |           Default           |
  +----------------+-----------------------------+-----------------------------+
- | &quot;title&quot;        | (set your own title)        |     &quot;untitled data&quot;         |
- | &quot;style&quot;        | &quot;points&quot;, &quot;lines&quot;,          |     &quot;points&quot;                |
- |                | &quot;impulses&quot;, &quot;&lt;x | y | xy&gt;&quot;  |                             |
- |                | &quot;errorbars&quot;, etc...         |                             |
- | &quot;axes&quot;         | &quot;x1y1&quot;, &quot;x2y2&quot;, &quot;x1y2&quot;, etc.|      &quot;x1y1&quot;                 |
- | &quot;type&quot;         | &quot;matrix&quot;, &quot;columns&quot;, &quot;file&quot; |      no default             |
- | &quot;using&quot;        | (set your own format string)|      &quot;1:2&quot;                  |
- +----------------+-----------------------------+-----------------------------+</PRE>
-<P>Data can be presented to <EM>Chart::Graph::Gnuplot</EM> in one of 3 formats for
-the convenience of the user:</P>
-<PRE>
- \@matrix: an array reference of [x,y] pairs of data</PRE>
-<P>Alternatively:</P>
-<PRE>
+ | 'type'         | 'matrix', 'columns', 'file',|      none                   |
+ |                |  'function', see examples   |                             |
+ |                |  below                      |                             |
+ | 'title'        | set your own title          |     'untitled data'         |
+ | 'style'        | 'points','lines','impulses' |     'points'                |
+ |                |  'errorbars', etc...        |                             |
+ |                |  see ERRORBARS example      |                             |
+ | 'axes'         | 'x1y1', 'x2y2', 'x1y2', etc.|      'x1y1'                 |
+ | 'using'        | map data to what will be    |      '1:2'                  |
+ |                |  plotted, see ERRORBARS     |                             |
+ |                |  example                    |                             |
+ +----------------+-----------------------------+-----------------------------+</pre>
+<p>Data can be presented to <em>Chart::Graph::Gnuplot</em> in one of 3 formats for
+the convenience of the user:</p>
+<pre>
+ \@matrix: an array reference of [x,y] pairs of data</pre>
+<p>Alternatively:</p>
+<pre>
  \@x_column, \@y_column: two array references of data of equal length.
- \@x_column is the x-axis data. \@y_column is the y-axis data.</PRE>
-<P>Finally, data can be stored in a file.</P>
-<P>
-<H2><A NAME="using gnuplot to read and plot date/time data directly">USING GNUPLOT TO READ AND PLOT DATE/TIME DATA DIRECTLY</A></H2>
-<P><EM>Gnuplot</EM> now has the capability to read date/time data and to create
+ \@x_column is the x-axis data. \@y_column is the y-axis data.</pre>
+<p>Finally, data can be stored in a file.</p>
+<p>
+</p>
+<h2><a name="using_gnuplot_to_read_and_plot_date_time_data_directly">USING GNUPLOT TO READ AND PLOT DATE/TIME DATA DIRECTLY</a></h2>
+<p><em>Gnuplot</em> now has the capability to read date/time data and to create
 graphs which display date/time on any axis.  Unfortunately, mechanism
 for reading data is less sophisticated than the mechanism for writing
-data.  <EM>Chart::Graph::Gnuplot</EM> implements date/time data in the same
-way as <EM>Gnuplot</EM> itself is presently implemented for consistency with
-the application.</P>
-<P>Any axis can be set to read date/time data instead of numerical
-data. This is done by setting the options <CODE>xdata</CODE>, <CODE>ydata</CODE>,
-<CODE>x2data</CODE>, or <CODE>y2data</CODE> to the value <CODE>time</CODE>.  Unfortunately, you can
+data.  <em>Chart::Graph::Gnuplot</em> implements date/time data in the same
+way as <em>Gnuplot</em> itself is presently implemented for consistency with
+the application.</p>
+<p>Any axis can be set to read date/time data instead of numerical
+data. This is done by setting the options <code>xdata</code>, <code>ydata</code>,
+<code>x2data</code>, or <code>y2data</code> to the value <code>time</code>.  Unfortunately, you can
 set only one format to read your data; therefore, consistency is
-advised.  The input format is set using the <CODE>timefmt</CODE> command noted
-above.  The <CODE>timefmt</CODE> command takes a string consisting of the
-elements noted below.</P>
-<P><EM>Gnuplot</EM> uses the same format codes for date/time input and output so
-the following table applies to both situations.</P>
-<PRE>
+advised.  The input format is set using the <code>timefmt</code> command noted
+above.  The <code>timefmt</code> command takes a string consisting of the
+elements noted below.</p>
+<p><em>Gnuplot</em> uses the same format codes for date/time input and output so
+the following table applies to both situations.</p>
+<pre>
  +---------+------------------------------------------------------------------+
  |  Format |                    Explanation                                   |
  +---------+------------------------------------------------------------------+
@@ -168,33 +188,33 @@ the following table applies to both situations.</P>
  |    %S   |       second, 0--60                                              |
  |    %b   |       three-character abbreviation of the name of the month      |
  |    %B   |       name of the month                                          |
- +---------+------------------------------------------------------------------+</PRE>
-<P>In addition there are some additional special cases for reading
-date/time data. To quote from <EM>Gnuplot</EM> manual: ``Any character is
-allowed in the string, but must match exactly. <CODE>\t</CODE> (tab) is
-recognized. Backslash-octals (<CODE>\nnn</CODE>) are converted to char. If there is
+ +---------+------------------------------------------------------------------+</pre>
+<p>In addition there are some additional special cases for reading
+date/time data. To quote from <em>Gnuplot</em> manual: ``Any character is
+allowed in the string, but must match exactly. <code>\t</code> (tab) is
+recognized. Backslash-octals (<code>\nnn</code>) are converted to char. If there is
 no separating character between the time/date elements, then %d, %m,
 %y, %H, %M and %S read two digits each, %Y reads four digits and %j
 reads three digits. %b requires three characters, and %B requires as
-many as it needs.''  <EM>Gnuplot</EM> uses the space character as white space
-pattern match - essentially the same as Perl's: <CODE>\s*</CODE>.</P>
-<P><EM>Gnuplot</EM> normally uses whitespace to separate datasets.  However,
-<EM>Gnuplot</EM> does recognize white space specified in the <CODE>timefmt</CODE>
+many as it needs.''  <em>Gnuplot</em> uses the space character as white space
+pattern match - essentially the same as Perl's: <code>\s*</code>.</p>
+<p><em>Gnuplot</em> normally uses whitespace to separate datasets.  However,
+<em>Gnuplot</em> does recognize white space specified in the <code>timefmt</code>
 string.  So for example, x-y data can be specified in columns like
-this:</P>
-<PRE>
- 25/01/2001 03:05:39 2.05e-5</PRE>
-<P>The <CODE>timefmt</CODE> string required would be: <CODE>&quot;%d/%m/%y %H:%M:%S&quot;</CODE>.  Note
+this:</p>
+<pre>
+ 25/01/2001 03:05:39 2.05e-5</pre>
+<p>The <code>timefmt</code> string required would be: <code>&quot;%d/%m/%y %H:%M:%S&quot;</code>.  Note
 that while the month and month abbreviation can be accepted, any other
 text must be matched (excluded) in the timefmt string.  Certainly,
-representing dates as numerically is probably the most conservative.</P>
-<P>Creating date/time labels for any of the axes is basically analogous.
-The <EM>Chart::Graph:Gnuplot</EM> global option is <CODE>format</CODE>, and it takes a
+representing dates as numerically is probably the most conservative.</p>
+<p>Creating date/time labels for any of the axes is basically analogous.
+The <em>Chart::Graph:Gnuplot</em> global option is <code>format</code>, and it takes a
 two element array reference: the axis to be plotted and the format
-string.  In addition to the time options listed above, <CODE>format</CODE>
+string.  In addition to the time options listed above, <code>format</code>
 supports the following additional codes for formatting the numerical
-data on the axes.</P>
-<PRE>
+data on the axes.</p>
+<pre>
  +-------------+--------------------------------------------------------------+
  |  Format     |                Explanation                                   |
  +-------------+--------------------------------------------------------------+
@@ -211,24 +231,24 @@ data on the axes.</P>
  |    %S       |   scientific power                                           |
  |    %c       |   character replacement for scientific power                 |
  |    %P       |   multiple of pi                                             |
- +-------------+--------------------------------------------------------------+</PRE>
-<P>As in the case of input there some additional options related to these
-output formats.  Again to quote the <EM>Gnuplot</EM> manual ``Other
-acceptable modifiers (which come after the <EM>%</EM> but before the format
-specifier) are <EM>-</EM>, which left-justifies the number; <EM>+</EM>, which
-forces all numbers to be explicitly signed; <EM>#</EM>, which places a
+ +-------------+--------------------------------------------------------------+</pre>
+<p>As in the case of input there some additional options related to these
+output formats.  Again to quote the <em>Gnuplot</em> manual ``Other
+acceptable modifiers (which come after the <em>%</em> but before the format
+specifier) are <em>-</em>, which left-justifies the number; <em>+</em>, which
+forces all numbers to be explicitly signed; <em>#</em>, which places a
 decimal point after floats that have only zeroes following the decimal
-point; a positive integer, which defines the field width; <EM>0</EM> (the
+point; a positive integer, which defines the field width; <em>0</em> (the
 digit, not the letter) immediately preceding the field width, which
 indicates that leading zeroes are to be used instead of leading
 blanks; and a decimal point followed by a non-negative integer, which
 defines the precision (the minimum number of digits of an integer, or
-the number of digits following the decimal point of a float).''</P>
-<P><EM>Gnuplot</EM> also provides more flexibility in terms of the output format
+the number of digits following the decimal point of a float).''</p>
+<p><em>Gnuplot</em> also provides more flexibility in terms of the output format
 codes available for date/time.  In addition to those shared with
 input, the following codes can be used for formatting output date/time
-axes only.</P>
-<PRE>
+axes only.</p>
+<pre>
  +-------------+--------------------------------------------------------------+
  |  Format     |                Explanation                                   |
  +-------------+--------------------------------------------------------------+
@@ -246,82 +266,68 @@ axes only.</P>
  |    %U       |   week of the year (week starts on Sunday)                   |
  |    %w       |   day of the week, 0--6 (Sunday = 0)                         |
  |    %W       |   week of the year (week starts on Monday)                   |
- +-------------+--------------------------------------------------------------+</PRE>
-<P>Finally, <EM>Chart::Graph::Gnuplot</EM> has an extension to support UNIX
-timestamps.  Note this <STRONG>not</STRONG> built into <EM>Gnuplot</EM> itself, but has
-been added for the convenience of researchers.  Users can access this
-option by setting the <CODE>xrange</CODE> using the <CODE>uts</CODE> option instead.  UNIX
-timestamps are only available on the x-axis at this time.  They cannot
-be used on y, x2, or y2.  See the last example for more details on
-using UNIX timestamps.</P>
-<P>
-<HR>
-<H1><A NAME="notes on graphic file formats">NOTES ON GRAPHIC FILE FORMATS</A></H1>
-<P>Previous versions of <EM>Chart::Graph::Gnuplot</EM> provided files in the
-Graphics Interchange Format or <EM>gif</EM> as a default.  This was and is
-still done via converter programs so that even with patent issues
-surrounding the <EM>gif</EM> file format is available even if <EM>Gnuplot</EM> 3.7.1
-and later no longer supports <EM>gif</EM>.  However, it is well advised that
-users shift to the more modern and patent free Portable Network
-Graphics or <EM>png</EM> format.  The <EM>png</EM> file format is supported
-directly by modern versions of <EM>Gnuplot</EM> so that no intermediate steps
-are necessary.  The <EM>png</EM> format also provides high compression
-without any loss in image quality.</P>
-<P>
-<HR>
-<H1><A NAME="examples">EXAMPLES</A></H1>
-<P>The following are four examples on how to use <EM>Chart::Graph::Gnuplot</EM> in
-a variety of settings.</P>
-<P>
-<H2><A NAME="general example">GENERAL EXAMPLE</A></H2>
-<P>The following example illustrates most of the general capabilities of
-<EM>Chart::Graph::Gnuplot</EM>. It creates the output file <EM>gnuplot1.png</EM>.
-in the <EM>png</EM> graphics format.  The data is coming from all three
+ +-------------+--------------------------------------------------------------+</pre>
+<p>Finally, <em>Chart::Graph::Gnuplot</em> has an extension to support UNIX
+timestamps.  Note this <strong>not</strong> built into <em>Gnuplot</em> itself.
+Users can access this option by setting the <code>xrange</code> using the <code>uts</code> 
+option instead.  UNIX timestamps are only available on the x-axis at this 
+time.  They cannot be used on y, x2, or y2.  See the last example for more 
+details on using UNIX timestamps.</p>
+<p>
+</p>
+<hr />
+<h1><a name="examples">EXAMPLES</a></h1>
+<p>The following are four examples on how to use <em>Chart::Graph::Gnuplot</em> in
+a variety of settings.</p>
+<p>
+</p>
+<h2><a name="general_example">GENERAL EXAMPLE</a></h2>
+<p>The following example illustrates most of the general capabilities of
+<em>Chart::Graph::Gnuplot</em>. It creates the output file <em>gnuplot1.png</em>.
+in the <em>png</em> graphics format.  The data is coming from all three
 sources.  The first data source is a matrix, the second is a column,
-and the last is an external data file.</P>
-<PRE>
-  use Chart::Graph::Gnuplot qw(gnuplot);</PRE>
-<PRE>
-  gnuplot({&quot;title&quot; =&gt; &quot;foo&quot;,
-           &quot;x2-axis label&quot; =&gt; &quot;bar&quot;,
-           &quot;logscale x2&quot; =&gt; &quot;1&quot;,
-           &quot;logscale y&quot; =&gt; &quot;1&quot;,
-           &quot;output type&quot; =&gt; &quot;png&quot;,
-           &quot;output file&quot; =&gt; &quot;gnuplot1.png&quot;,
-           &quot;xtics&quot; =&gt; [ [&quot;small\\nfoo&quot;, 10], [&quot;medium\\nfoo&quot;, 20], [&quot;large\\nfoo&quot;, 30] ],
-           &quot;ytics&quot; =&gt; [10,20,30,40,50]},
-           &quot;xdata&quot; =&gt; &quot;time&quot;,
-           &quot;format&quot; =&gt; [&quot;x&quot;, &quot;%m/%d&quot;],
-           &quot;timefmt&quot;=&gt; $date_format,
-           &quot;extra_opts&quot; =&gt; &quot;set key left top Left&quot;,
-          [{&quot;title&quot; =&gt; &quot;data1&quot;,
-            &quot;type&quot; =&gt; &quot;matrix&quot;}, [[1, 10],
+and the last is an external data file.</p>
+<pre>
+  use Chart::Graph::Gnuplot qw(gnuplot);</pre>
+<pre>
+  gnuplot({'title' =&gt; 'foo',
+           'x2-axis label' =&gt; 'bar',
+           'logscale x2' =&gt; '1',
+           'logscale y' =&gt; '1',
+           'output type' =&gt; 'png',
+           'output file' =&gt; 'gnuplot1.png',
+           'xtics' =&gt; [ ['small\nfoo', 10], ['medium\nfoo', 20], ['large\nfoo', 30] ],
+           'ytics' =&gt; [10,20,30,40,50],
+           'extra_opts' =&gt; 'set key left top Left'},
+          [{'title' =&gt; 'data1',
+            'type' =&gt; 'matrix'}, [[1, 10],
                                   [2, 20],
                                   [3, 30]] ],
-          [{&quot;title&quot; =&gt; &quot;data2&quot;,
-            &quot;style&quot; =&gt; &quot;lines&quot;,
-            &quot;type&quot; =&gt; &quot;columns&quot;}, [8, 26, 50, 60, 70],
+          [{'title' =&gt; 'data2',
+            'style' =&gt; 'lines',
+            'type' =&gt; 'columns'}, [8, 26, 50, 60, 70],
                                   [5, 28, 50, 60, 70] ],
-          [{&quot;title&quot; =&gt; &quot;data3&quot;,
-            &quot;style&quot; =&gt; &quot;lines&quot;,
-            &quot;type&quot; =&gt; &quot;file&quot;}, &quot;samplefile&quot;],);</PRE>
+          [{'title' =&gt; 'data3',
+            'style' =&gt; 'lines',
+            'type' =&gt; 'file'}, './samplefile'],);</pre>
 <p><center><img src="gnuplot1.png"></center></p>
-<p><center><em>gnuplot1.png</em></center></p><P>
-<H2><A NAME="errorbars">ERRORBARS</A></H2>
-<P><EM>Gnuplot</EM> supports errorbars to aid in data interpretation.  To use an
-arbitrary number of data columns (for errorbars), set <CODE>style</CODE> to
-<CODE>errorbars</CODE> and include extra data columns.  The example below
-produces the file <EM>gnuplot2.png</EM></P>
-<P>Note the following: These columns MUST be the the following formats:
-<CODE>(x, y, ydelta)</CODE>, <CODE>(x, y, ylow, yhigh)</CODE>, <CODE>(x, y, xdelta)</CODE>, <CODE>(x, y,
-xlow, xhigh)</CODE>, <CODE>(x, y, xdelta, ydelta)</CODE>, or <CODE>(x, y, xlow, xhigh,
-ylow, yhigh)</CODE> This will only work with data type <CODE>columns</CODE>. Also, you
-MUST use the <CODE>using</CODE> option to specify how columns of the data file
-are to be assigned to <CODE>x</CODE>, <CODE>y</CODE>, <CODE>ydelta</CODE>, <CODE>ylow</CODE> and <CODE>yhigh</CODE>,
-<CODE>xdelta</CODE>, <CODE>xlow</CODE> and <CODE>xhigh</CODE>.</P>
-<PRE>
-     use Chart::Graph::Gnuplot qw(gnuplot);</PRE>
-<PRE>
+<p><center><em>gnuplot1.png</em></center></p><p>
+</p>
+<h2><a name="errorbars">ERRORBARS</a></h2>
+<p><em>Gnuplot</em> supports errorbars to aid in data interpretation.  To use an
+arbitrary number of data columns (for errorbars), set <code>style</code> to
+<code>errorbars</code> and include extra data columns.  The example below
+produces the file <em>gnuplot2.png</em></p>
+<p>Note the following: These columns MUST be the the following formats:
+<code>(x, y, ydelta)</code>, <code>(x, y, ylow, yhigh)</code>, <code>(x, y, xdelta)</code>, <code>(x, y,
+xlow, xhigh)</code>, <code>(x, y, xdelta, ydelta)</code>, or <code>(x, y, xlow, xhigh,
+ylow, yhigh)</code> This will only work with data type <code>columns</code>. Also, you
+MUST use the <code>using</code> option to specify how columns of the data file
+are to be assigned to <code>x</code>, <code>y</code>, <code>ydelta</code>, <code>ylow</code> and <code>yhigh</code>,
+<code>xdelta</code>, <code>xlow</code> and <code>xhigh</code>.</p>
+<pre>
+     use Chart::Graph::Gnuplot qw(gnuplot);</pre>
+<pre>
      gnuplot({&quot;title&quot; =&gt; &quot;Examples of Errorbars&quot;,
               &quot;xrange&quot; =&gt; &quot;[:11]&quot;,
               &quot;yrange&quot; =&gt; &quot;[:45]&quot;,
@@ -386,179 +392,248 @@ are to be assigned to <CODE>x</CODE>, <CODE>y</CODE>, <CODE>ydelta</CODE>, <CODE
                [ 30, 27, 25, 23, 27, 33 ], # y
                [ .2, .1, .3, .6, .4, .3 ], # xdelta
               [ .8, .7, .3, .6, 1.0, .3 ] ], # ydelta
-           );</PRE>
+           );</pre>
 <p><center><img src="gnuplot2.gif"></center></p>
-<p><center><em>gnuplot2.gif</em></center></p><P>
-<H2><A NAME="plotting dates  custom gnuplot options">PLOTTING DATES - CUSTOM GNUPLOT OPTIONS</A></H2>
-<P>As noted above, <EM>Chart::Graph::Gnuplot</EM> includes support for plotting
+<p><center><em>gnuplot2.gif</em></center></p><p>
+</p>
+<h2><a name="plotting_dates__custom_gnuplot_options">PLOTTING DATES - CUSTOM GNUPLOT OPTIONS</a></h2>
+<p>As noted above, <em>Chart::Graph::Gnuplot</em> includes support for plotting
 date and times as source data.  the following shows how to plot data,
 where the x-axis contains dates, and the y-axis contains stock prices
 from a major computer major during the ``dot-com meltdown.'' For date
 and time data that requires high precision, using UNIX time stamps is
 probably the best solution (see below.)  As used in the first example,
-any option available to <EM>Gnuplot</EM> can be passed to <EM>Gnuplot</EM> using
-the <CODE>extra_opts</CODE> option. This example uses this feature to enable two
+any option available to <em>Gnuplot</em> can be passed to <em>Gnuplot</em> using
+the <code>extra_opts</code> option. This example uses this feature to enable two
 options: a grid over the graph and a timestamp for when the graph was
-created.</P>
-<PRE>
-  use Chart::Graph::Gnuplot qw(gnuplot);</PRE>
-<PRE>
+created.</p>
+<pre>
+  use Chart::Graph::Gnuplot qw(gnuplot);</pre>
+<pre>
   #Debugging aid - save the temporary files if desired
   #$Chart::Graph::save_tmpfiles = 1;
   #Debugging aid - turn on extra debugging messages
-  #$Chart::Graph::debug = 1;</PRE>
-<PRE>
-  # Call and &quot;usual&quot; global parameters
-  gnuplot({&quot;title&quot; =&gt; &quot;Corporate stock values for a major computer maker&quot;,
-           &quot;x-axis label&quot; =&gt; &quot;Month and Year&quot;,
-           &quot;y-axis label&quot; =&gt; &quot;Stock price&quot;,
-           &quot;output type&quot; =&gt; &quot;png&quot;,
-           &quot;output file&quot; =&gt; &quot;gnuplot3.png&quot;,
+  #$Chart::Graph::debug = 1;</pre>
+<pre>
+  # Call and &quot;usual&quot; global parameters</pre>
+<pre>
+  gnuplot({'title' =&gt; 'Corporate stock values for a major computer maker',
+           'x-axis label' =&gt; 'Month and Year',
+           'y-axis label' =&gt; 'Stock price',
+           'output type' =&gt; 'png',
+           'output file' =&gt; 'gnuplot3.png',
            # Setting date/time specific options.
-           &quot;xdata&quot; =&gt; &quot;time&quot;,
-           &quot;timefmt&quot; =&gt; &quot;%m/%d/%Y&quot;,
-           &quot;format&quot; =&gt; [&quot;x&quot;, &quot;%m/%d/%Y&quot;],
+           'xdata' =&gt; 'time',
+           'timefmt' =&gt; '%m/%d/%Y',
+           'format' =&gt; ['x', '%m/%d/%Y'],
            # Set output range - note quoting of date string
-           &quot;xrange&quot; =&gt; &quot;[\&quot;06/01/2000\&quot;:\&quot;08/01/2001\&quot;]&quot;,
-           &quot;extra_opts&quot; =&gt; join(&quot;\n&quot;, &quot;set grid&quot;, &quot;set timestamp&quot;),
-          },</PRE>
-<PRE>
+           'xrange' =&gt; '[&quot;06/01/2000&quot;:&quot;08/01/2001&quot;]',
+           'extra_opts' =&gt; join(&quot;\n&quot;, 'set grid', 'set timestamp'),
+          },
           # Data for when stock opened
-          [{&quot;title&quot; =&gt; &quot;open&quot;,
-            &quot;type&quot; =&gt; &quot;matrix&quot;,
-            &quot;style&quot; =&gt; &quot;lines&quot;,
+          [{'title' =&gt; 'open',
+            'type' =&gt; 'matrix',
+            'style' =&gt; 'lines',
            },
            [
-            [&quot;06/01/2000&quot;,  &quot;81.75&quot;],
-            [&quot;07/01/2000&quot;, &quot;52.125&quot;],
-            [&quot;08/01/2000&quot;, &quot;50.3125&quot;],
-            [&quot;09/01/2000&quot;, &quot;61.3125&quot;],
-            [&quot;10/01/2000&quot;, &quot;26.6875&quot;],
-            [&quot;11/01/2000&quot;, &quot;19.4375&quot;],
-            [&quot;12/01/2000&quot;, &quot;17&quot;],
-            [&quot;01/01/2001&quot;, &quot;14.875&quot;],
-            [&quot;02/01/2001&quot;, &quot;20.6875&quot;],
-            [&quot;03/01/2001&quot;, &quot;17.8125&quot;],
-            [&quot;04/01/2001&quot;, &quot;22.09&quot;],
-            [&quot;05/01/2001&quot;, &quot;25.41&quot;],
-            [&quot;06/01/2001&quot;, &quot;20.13&quot;],
-            [&quot;07/01/2001&quot;, &quot;23.64&quot;],
-            [&quot;08/01/2001&quot;, &quot;19.01&quot;],
+            ['06/01/2000',  '81.75'],
+            ['07/01/2000', '52.125'],
+            ['08/01/2000', '50.3125'],
+            ['09/01/2000', '61.3125'],
+            ['10/01/2000', '26.6875'],
+            ['11/01/2000', '19.4375'],
+            ['12/01/2000', '17'],
+            ['01/01/2001', '14.875'],
+            ['02/01/2001', '20.6875'],
+            ['03/01/2001', '17.8125'],
+            ['04/01/2001', '22.09'],
+            ['05/01/2001', '25.41'],
+            ['06/01/2001', '20.13'],
+            ['07/01/2001', '23.64'],
+            ['08/01/2001', '19.01'],
            ]
-          ],</PRE>
-<PRE>
+          ],</pre>
+<pre>
           # Data for stock high
-          [{&quot;title&quot; =&gt; &quot;high&quot;,
-            &quot;type&quot; =&gt; &quot;matrix&quot;,
-            &quot;style&quot; =&gt; &quot;lines&quot;,
+          [{'title' =&gt; 'high',
+            'type' =&gt; 'matrix',
+            'style' =&gt; 'lines',
            },
            [
-            [&quot;06/01/2000&quot;, &quot;103.9375&quot;],
-            [&quot;07/01/2000&quot;, &quot;60.625&quot;],
-            [&quot;08/01/2000&quot;, &quot;61.50&quot;],
-            [&quot;09/01/2000&quot;, &quot;64.125&quot;],
-            [&quot;10/01/2000&quot;, &quot;26.75&quot;],
-            [&quot;11/01/2000&quot;, &quot;23&quot;],
-            [&quot;12/01/2000&quot;, &quot;17.50&quot;],
-            [&quot;01/01/2001&quot;, &quot;22.50&quot;],
-            [&quot;02/01/2001&quot;, &quot;21.9375&quot;],
-            [&quot;03/01/2001&quot;, &quot;23.75&quot;],
-            [&quot;04/01/2001&quot;, &quot;27.12&quot;],
-            [&quot;05/01/2001&quot;, &quot;26.70&quot;],
-            [&quot;06/01/2001&quot;, &quot;25.10&quot;],
-            [&quot;07/01/2001&quot;, &quot;25.22&quot;],
-            [&quot;08/01/2001&quot;, &quot;19.90&quot;],
+            ['06/01/2000', '103.9375'],
+            ['07/01/2000', '60.625'],
+            ['08/01/2000', '61.50'],
+            ['09/01/2000', '64.125'],
+            ['10/01/2000', '26.75'],
+            ['11/01/2000', '23'],
+            ['12/01/2000', '17.50'],
+            ['01/01/2001', '22.50'],
+            ['02/01/2001', '21.9375'],
+            ['03/01/2001', '23.75'],
+            ['04/01/2001', '27.12'],
+            ['05/01/2001', '26.70'],
+            ['06/01/2001', '25.10'],
+            ['07/01/2001', '25.22'],
+            ['08/01/2001', '19.90'],
            ]
-           ],</PRE>
-<PRE>
+          ],</pre>
+<pre>
           # Data for stock close
-          [{&quot;title&quot; =&gt; &quot;close&quot;,
-            &quot;type&quot; =&gt; &quot;matrix&quot;,
-            &quot;style&quot; =&gt; &quot;lines&quot;,
+          [{'title' =&gt; 'close',
+            'type' =&gt; 'matrix',
+            'style' =&gt; 'lines',
            },
-           [</PRE>
-<PRE>
-            [&quot;06/01/2000&quot;, &quot;52.375&quot;],
-            [&quot;07/01/2000&quot;, &quot;50.8125&quot;],
-            [&quot;08/01/2000&quot;, &quot;60.9375&quot;],
-            [&quot;09/01/2000&quot;, &quot;25.75&quot;],
-            [&quot;10/01/2000&quot;, &quot;19.5625&quot;],
-            [&quot;11/01/2000&quot;, &quot;16.50&quot;],
-            [&quot;12/01/2000&quot;, &quot;14.875&quot;],
-            [&quot;01/01/2001&quot;, &quot;21.625&quot;],
-            [&quot;02/01/2001&quot;, &quot;18.25&quot;],
-            [&quot;03/01/2001&quot;, &quot;22.07&quot;],
-            [&quot;04/01/2001&quot;, &quot;25.49&quot;],
-            [&quot;05/01/2001&quot;, &quot;19.95&quot;],
-            [&quot;06/01/2001&quot;, &quot;23.25&quot;],
-            [&quot;07/01/2001&quot;, &quot;18.79&quot;],
-            [&quot;08/01/2001&quot;, &quot;18.55&quot;],
+           [</pre>
+<pre>
+            ['06/01/2000', '52.375'],
+            ['07/01/2000', '50.8125'],
+            ['08/01/2000', '60.9375'],
+            ['09/01/2000', '25.75'],
+            ['10/01/2000', '19.5625'],
+            ['11/01/2000', '16.50'],
+            ['12/01/2000', '14.875'],
+            ['01/01/2001', '21.625'],
+            ['02/01/2001', '18.25'],
+            ['03/01/2001', '22.07'],
+            ['04/01/2001', '25.49'],
+            ['05/01/2001', '19.95'],
+            ['06/01/2001', '23.25'],
+            ['07/01/2001', '18.79'],
+            ['08/01/2001', '18.55'],
            ]
           ]
-);</PRE>
+);</pre>
 <p><center><img src="gnuplot3.png"></center></p>
-<p><center><em>gnuplot3.png</em></center></p><P>
-<H2><A NAME="unix time stamps">UNIX TIME STAMPS</A></H2>
-<P><EM>Chart::Graph::Gnuplot</EM> can convert Unix timestamps into normal dates
+<p><center><em>gnuplot3.png</em></center></p><p>
+</p>
+<h2><a name="unix_timestamps">UNIX TIMESTAMPS</a></h2>
+<p><em>Chart::Graph::Gnuplot</em> can convert Unix timestamps into normal dates
 for x-axis values. Collisions with existing user x-tics are can be
-remedied by prepending ``\\n'' to their tic-labels.</P>
-<PRE>
-    [...]</PRE>
-<PRE>
+remedied by prepending a literal '\n' (or ``\\n'') to their tic-labels.
+The 'uts' option takes an array ref with 2 to 4 elements:
+[ start_timestamp, end_timestamp, &lt;scale&gt;, &lt;use_local_timezone&gt; ]
+If the optional element 'scale' is &gt; 1 the number of tics will be reduced.
+If the optional element 'use_local_timezone' is set to non-zero value
+the local timezone is used, UTC is assumed otherwise.
+The variables <em>$Chart::Graph::Gnuplot::show_year</em> and 
+<em>$Chart::Graph::Gnuplot::show_seconds</em> influence the formatting of the x-tics.</p>
+<pre>
+    [...]</pre>
+<pre>
     %options = (
-                 &quot;title&quot; =&gt; &quot;foo&quot;,
-                 &quot;output file&quot; =&gt; &quot;gnuplot4.gif&quot;,
-                 &quot;output type&quot; =&gt; &quot;gif&quot;,
-                 &quot;x2-axis label&quot; =&gt; &quot;bar&quot;,
-                 &quot;xtics&quot; =&gt; [ [&quot;\\n10pm&quot;, 954795600] ],
-                 &quot;ytics&quot; =&gt; [10,20,30,40,50],
-                 &quot;extra_opts&quot; =&gt; &quot;set nokey&quot;,
-                 &quot;uts&quot; =&gt; [954791100, 954799300],
-               );</PRE>
-<PRE>
-    $plot = [{&quot;title&quot; =&gt; &quot;Your title&quot;,
-              &quot;type&quot; =&gt; &quot;matrix&quot;},
+                 'title' =&gt; 'uts example',
+                 'output file' =&gt; 'gnuplot4.gif',
+                 'output type' =&gt; 'gif',
+                 'x2-axis label' =&gt; 'time',
+                 'xtics' =&gt; [ ['\n9pm UTC', 954795600] ],
+                 'ytics' =&gt; [10,20,30,40,50],
+                 'extra_opts' =&gt; 'set nokey',
+                 'uts' =&gt; [954791100, 954799300],
+               );</pre>
+<pre>
+    $plot = [{'title' =&gt; 'Your title',
+              'type' =&gt; 'matrix'},
               [
                 [954792100, 10],
                 [954793100, 18],
                 [954794100, 12],
                 [954795100, 26],
-                [954795600, 13], # 22:00
+                [954795600, 13], # 21:00
                 [954796170, 23],
                 [954797500, 37],
                 [954799173, 20],
                 [954799300, 48],
               ],
-            ];</PRE>
-<PRE>
-    gnuplot(\%options, $plot);</PRE>
+            ];</pre>
+<pre>
+    gnuplot(\%options, $plot);</pre>
 <p><center><img src="gnuplot4.gif"></center></p>
-<p><center><em>gnuplot4.gif</em></center></p><P><STRONG>Note:</STRONG> The present implementation of UNIX time stamps only supports
-assigning <EM>xtics</EM> for x-axis labels.  Using the Gnuplot directive:
-<CODE>format</CODE> is not supported.</P>
-<P>
-<HR>
-<H1><A NAME="more info">MORE INFO</A></H1>
-<P>For more information on gnuplot, please see the gnuplot web page:</P>
-<PRE>
- <A HREF="http://www.gnuplot.org/">http://www.gnuplot.org/</A></PRE>
-<P>
-<HR>
-<H1><A NAME="contact">CONTACT</A></H1>
-<P>Send email to <A HREF="mailto:graph-dev@caida.org">graph-dev@caida.org</A> is you have problems, questions,
+<p><center><em>gnuplot4.gif</em></center></p><p><strong>Note:</strong> The present implementation of UNIX time stamps only supports
+assigning <em>xtics</em> for x-axis labels.  Using the Gnuplot directive:
+<code>format</code> is not supported.</p>
+<p>
+</p>
+<h2><a name="functions">FUNCTIONS</a></h2>
+<p><em>Chart::Graph::Gnuplot</em> supports the plotting of functions, this can
+be mixed with other data-types:</p>
+<pre>
+   my %options = (
+                   'title' =&gt; 'plot functions example',
+                   'output file' =&gt; 'gnuplot5.png',
+                 );</pre>
+<pre>
+   my $data = [{ 'title' =&gt; 'data 1',
+                 'style' =&gt; 'lines',
+                 'type' =&gt; 'matrix',
+               },
+               [
+                 [0,10],
+                 [3,30],
+                 [6,0],
+                 [9,-10],
+                 [12,-0],
+               ]
+              ];</pre>
+<pre>
+   my $fnc1 = [{ 'title' =&gt; 'function 1',
+                 'style' =&gt; 'lines',
+                 'type' =&gt; 'function',
+               },
+               '10*sin(x)+2*cos(1.1 * x)+.5*tan(x)'
+              ];</pre>
+<pre>
+   my $fnc2 = [{ 'title' =&gt; 'function 2',
+                 'style' =&gt; 'lines',
+                 'type' =&gt; 'function',
+               },
+              '20*sin(sqrt(2**x))/sqrt(2**x)'
+              ];</pre>
+<pre>
+    gnuplot(\%options, $data, $fnc1, $fnc2);</pre>
+<p><center><img src="gnuplot5.png"></center></p>
+<p><center><em>gnuplot5.png</em></center></p><p>
+</p>
+<hr />
+<h1><a name="more_info">MORE INFO</a></h1>
+<p>This version of <em>Chart::Graph::Gnuplot</em> was tested against
+Gnuplot Version 4.0 patchlevel 0, some features might not work
+on older versions of gnuplot. 
+
+</p>
+<p>For more information on gnuplot, please see the gnuplot web page:
+
+</p>
+<pre>
+ <a href="http://www.gnuplot.org/">http://www.gnuplot.org/</a>
+
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="contact">CONTACT</a></h1>
+<p>Send email to <a href="mailto:graph-dev@caida.org">graph-dev@caida.org</a> is you have problems, questions,
 or comments. To subscribe to the mailing list send mail to
-<A HREF="mailto:graph-dev-request@caida.org">graph-dev-request@caida.org</A> with a body of ``subscribe <A HREF="mailto:your@email.com''">your@email.com''</A></P>
-<P>
-<HR>
-<H1><A NAME="author">AUTHOR</A></H1>
-<PRE>
- CAIDA Perl development team (cpan@caida.org)</PRE>
-<P>
-<HR>
-<H1><A NAME="see also">SEE ALSO</A></H1>
-<PRE>
- gnuplot(1).</PRE>
+<a href="mailto:graph-dev-request@caida.org">graph-dev-request@caida.org</a> with a body of ``subscribe <a href="mailto:your@email.com''">your@email.com''</a>
 
-</BODY>
+</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<pre>
+ CAIDA Perl development team (cpan@caida.org)
 
-</HTML>
+</pre>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<pre>
+ gnuplot(1).
+ 
+
+</pre>
+
+</body>
+
+</html>

@@ -1,7 +1,7 @@
 ## Xmgrace.pm is a sub-module of Graph.pm. It has all the subroutines 
 ## needed for the gnuplot part of the package.
 ##
-## $Id: Xmgrace.pm,v 1.30 2001/10/23 22:17:37 elagache Exp $ $Name:  $
+## $Id: Xmgrace.pm,v 1.31 2006/04/18 17:56:48 emile Exp $ $Name:  $
 ##
 ## This software product is developed by Esmond Lee and David Moore,
 ## and copyrighted(C) 1998 by the University of California, San Diego
@@ -52,12 +52,12 @@ use Chart::Graph::Xmgrace::Graph_Presentation_Type;
 use Chart::Graph::Xmgrace::Dataset;
 use FileHandle;
 
-$cvs_Id = '$Id: Xmgrace.pm,v 1.30 2001/10/23 22:17:37 elagache Exp $';
-$cvs_Author = '$Author: elagache $';
+$cvs_Id = '$Id: Xmgrace.pm,v 1.31 2006/04/18 17:56:48 emile Exp $';
+$cvs_Author = '$Author: emile $';
 $cvs_Name = '$Name:  $';
-$cvs_Revision = '$Revision: 1.30 $';
+$cvs_Revision = '$Revision: 1.31 $';
 
-$VERSION = 2.0;
+$VERSION = 3.0;
 
 use strict;
 

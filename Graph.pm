@@ -1,7 +1,7 @@
 ## Graph.pm is a graphing package that supports on-the-fly graphing 
 ## from the gnuplot, XRT, and Xmgrace graphing packages.
 ##
-## $Id: Graph.pm,v 1.44 2001/10/24 20:50:43 elagache Exp $ $Name:  $
+## $Id: Graph.pm,v 1.45 2006/04/18 17:56:47 emile Exp $ $Name:  $
 ##
 ## This software product is developed by Michael Young and David Moore,
 ## and copyrighted(C) 1998 by the University of California, San Diego
@@ -39,15 +39,15 @@
 package Chart::Graph;
 use Exporter();
 
-$VERSION = 2.0;
+$VERSION = '3.0';
 @ISA = qw(Exporter);
 @EXPORT = qw();
 @EXPORT_OK = qw(&gnuplot &xrt3d &xrt2d &xmgrace);
 
-$cvs_Id = '$Id: Graph.pm,v 1.44 2001/10/24 20:50:43 elagache Exp $';
-$cvs_Author = '$Author: elagache $';
+$cvs_Id = '$Id: Graph.pm,v 1.45 2006/04/18 17:56:47 emile Exp $';
+$cvs_Author = '$Author: emile $';
 $cvs_Name = '$Name:  $';
-$cvs_Revision = '$Revision: 1.44 $';
+$cvs_Revision = '$Revision: 1.45 $';
 
 use Chart::Graph::Utils qw(:USER);
 use Chart::Graph::Gnuplot qw(&gnuplot);

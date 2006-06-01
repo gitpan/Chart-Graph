@@ -50,6 +50,7 @@ t/gnuplot.t
 t/xmgrace.t
 t/xrt2d.t
 t/xrt3d.t
+t/sample.gnuplot
 test_results/.empty
 xrt2d/Makefile
 xrt2d/README
@@ -65,3 +66,4 @@ xrt3d/test.dat
 xrt3d/xrt3d.c
 xrt3d/xrt3d.h
 xrt3d_data.txt
+META.yml                                 Module meta-data (added by MakeMaker)

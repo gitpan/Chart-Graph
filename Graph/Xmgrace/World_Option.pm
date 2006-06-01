@@ -36,7 +36,7 @@
 ##
 ##
 
-$VERSION = 2.0;
+$VERSION = 3.0;
 
 package World_Option;
 use Base_Option;

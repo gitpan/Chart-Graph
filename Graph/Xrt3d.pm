@@ -1,7 +1,7 @@
 ## Xrt3d.pm is a sub-module of Graph.pm. It has all the subroutines 
 ## needed for the Xrt3d part of the package.
 ##
-## $Id: Xrt3d.pm,v 1.26 2001/10/23 22:17:37 elagache Exp $ $Name:  $
+## $Id: Xrt3d.pm,v 1.27 2006/04/18 17:56:48 emile Exp $ $Name:  $
 ##
 ## This software product is developed by Michael Young and David Moore,
 ## and copyrighted(C) 1998 by the University of California, San Diego
@@ -49,12 +49,12 @@ use Carp;			# for carp() and croak()
 use Chart::Graph::Utils qw(:UTILS);	# get global subs and variables
 use Chart::Graph::XrtUtils qw(:UTILS);
 
-$cvs_Id = '$Id: Xrt3d.pm,v 1.26 2001/10/23 22:17:37 elagache Exp $';
-$cvs_Author = '$Author: elagache $';
+$cvs_Id = '$Id: Xrt3d.pm,v 1.27 2006/04/18 17:56:48 emile Exp $';
+$cvs_Author = '$Author: emile $';
 $cvs_Name = '$Name:  $';
-$cvs_Revision = '$Revision: 1.26 $';
+$cvs_Revision = '$Revision: 1.27 $';
 
-$VERSION = 2.0;
+$VERSION = 3.0;
 
 use strict;
 
@@ -414,7 +414,10 @@ Chart::Graph::Xrt3d
 
 =head1 DESCRIPTION
 
-Sitraka makes a number of graphics packages for UNIX systems.  XRT is
+This module is unmaintained, it worked with Sitraka's XRT, and hasn't been
+tested against newer versions.
+
+Sitraka (now Quest) makes a number of graphics packages for UNIX systems.  XRT is
 a Motif-based commercial software product that has been adapted by
 CAIDA using a combination of C drivers and Perl function I<xrt3d()>.
 The Perl function I<xrt3d()> provides access to the three dimensional
@@ -600,9 +603,9 @@ The data file used in the above example is as follows.
 
 =head1 MORE INFO
 
-For more information on XRT, please contact Sitraka:
+For more information on XRT:
 
- http://www.sitraka.com
+ http://www.quest.com/xrt_pds/
 
 =head1 CONTACT
 

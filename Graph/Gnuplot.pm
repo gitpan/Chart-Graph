@@ -1,7 +1,7 @@
 ## Gnuplot.pm is a sub-module of Graph.pm. It has all the subroutines 
 ## needed for the gnuplot part of the package.
 ##
-## $Id: Gnuplot.pm,v 1.37 2001/10/29 22:56:25 elagache Exp $ $Name:  $
+## $Id: Gnuplot.pm,v 1.44 2006/04/18 17:56:47 emile Exp $ $Name:  $
 ##
 ## This software product is developed by Michael Young and David Moore,
 ## and copyrighted(C) 1998 by the University of California, San Diego
@@ -49,14 +49,16 @@ use Chart::Graph::Utils qw(:UTILS);	# get global subs and variable
 use POSIX 'strftime';
 use FileHandle;
 
-$cvs_Id = '$Id: Gnuplot.pm,v 1.37 2001/10/29 22:56:25 elagache Exp $';
-$cvs_Author = '$Author: elagache $';
+$cvs_Id = '$Id: Gnuplot.pm,v 1.44 2006/04/18 17:56:47 emile Exp $';
+$cvs_Author = '$Author: emile $';
 $cvs_Name = '$Name:  $';
-$cvs_Revision = '$Revision: 1.37 $';
+$cvs_Revision = '$Revision: 1.44 $';
 
-$VERSION = 2.0;
+$VERSION = 3.0;
 
 use strict;
+
+use vars qw($show_year $show_seconds);
 
 # these variables  hold default options for gnuplot
 my %def_gnu_global_opts = (
@@ -97,6 +99,7 @@ my %def_gnu_data_opts = (
 			 "type" => undef,
                          "using" => "1:2",
 			);
+
 
 
 #
@@ -155,30 +158,28 @@ sub gnuplot {
     # check if uts option is chosen and process first
     if (my $value = $global_opts{uts}) {
 	if (defined($value) and ref($value) eq "ARRAY") {
-	    if (@{$value} ne "2") {
-		carp "out of range for 'uts': [start, end]\n";
+	    if (@{$value} < 2 || @{$value} > 4) {
+		carp "out of range for 'uts': [start, end, <scale>, <use_local_timezone>]\n";
 		_cleanup_tmpdir();
 		return 0;
 	    }		
 	    # set x tics to human readable time stamps
-	    _gnuplot_date_utc($value->[0], $value->[1], \%global_opts);
+	    _gnuplot_date_utc($value->[0], $value->[1], $value->[2], $value->[3], \%global_opts);
 	} else {
-	    carp "Invalid value for 'uts', give [start, end]";
+	    carp "Invalid value for 'uts', give [start, end, <scale>, <use_local_timezone>]\n";
 	}
     }
 
-    # check if uts option is chosen and process first
+    # uts_normalize will be removed in a future version, so don't use it
     if (my $value = $global_opts{uts_normalize}) {
 	if (defined($value) and ref($value) eq "ARRAY") {
-	    if (@{$value} ne "2" && @{$value} ne "3") {
-		carp "out of range for 'uts_normalize': [start, end]\n";
+	    if (@{$value} < 2 || @{$value} > 3) {
+		carp "out of range for 'uts_normalize': [start, end, <scale> ]\n";
 		_cleanup_tmpdir();
 		return 0;
 	    }		
 	    # set x tics to human readable time stamps
-	    _gnuplot_date_utc_normalize($value->[0], 
-					$value->[1], $value->[2],
-					\%global_opts);
+	    _gnuplot_date_utc_normalize($value->[0], $value->[1], $value->[2], \%global_opts);
 	} else {
 	    carp "Invalid value for 'uts_normalize', give [start, end]";
 	}
@@ -188,14 +189,14 @@ sub gnuplot {
     # these must be in command file before any others.
     foreach my $time_set ("xdata", "ydata", "x2data", "y2data") {
 	if (defined($global_opts{$time_set})) {
-	    print $handle "set $time_set time\n;"
+	    print $handle "set $time_set time\n";
 	}
     }
 	
     # Set the format for reading data/time data. Only one format for all axes.
     if (my $value = $global_opts{timefmt}) {
 	if (defined($value)) {
-	    print $handle "set timefmt \"$value\"\n;"
+	    print $handle "set timefmt \"$value\"\n";
 	}
     }
 
@@ -205,7 +206,14 @@ sub gnuplot {
 	## Generic pass-thru, stuff random Gnuplot commands in this key
         if ($key eq "extra_opts") {
 	    if (defined $value) {
-		print $handle "$value\n";
+		if (ref($value) eq 'ARRAY') {
+		    # arrayref
+		    print $handle join("\n", @$value);
+		    print $handle "\n"; 
+		} else {
+		    # assume it's a string and user provided \n's
+		    print $handle "$value\n";
+		}
 	    }
         }
 
@@ -289,14 +297,15 @@ sub gnuplot {
 		}
 	    }		
 	}
-	if ($key eq "xrange") {
+	if ($key eq 'xrange' || $key eq 'yrange' ) {
 	    if (defined($value)) { 
-		print $handle "set $key $value\n";
-	    }
-	}
-	if ($key eq "yrange") {
-	    if (defined($value)) { 
-		print $handle "set $key $value\n";
+		if (ref($value) eq 'ARRAY') {
+		    # arrayref
+		    print $handle "set $key [$value->[0] : $value->[1]]\n";
+		} else {
+		    # assume string
+		    print $handle "set $key $value\n";
+		}
 	    }
 	}
 	# The only time related Gnuplot code that doesn't need to be
@@ -335,8 +344,8 @@ sub gnuplot {
 	    # already been processed 	    
 	}
 	if ($key eq "size" && defined $value) {
-            if (@{$value} == 2) {
-		print $handle "set $key ",@{$value}[0],",",@{$value}[1],"\n";
+            if (ref($value) eq 'ARRAY' && @{$value} == 2) {
+		print $handle "set $key ". @{$value}[0] . "," . @{$value}[1] . "\n";
 	    }
 	    else {
 		
@@ -349,7 +358,7 @@ sub gnuplot {
 	}
 	
 	if ($key eq "output type") {
-	    if (!($value =~ /^(pbm|gif|tgif|png|eps)$/)) {
+	    if (!($value =~ /^(pbm|gif|tgif|png|svg|eps(:? .*)?)$/)) {
 		carp "invalid output type: $value";
 		$handle->close();
 		_cleanup_tmpdir();
@@ -360,27 +369,47 @@ sub gnuplot {
     }
 
     # create the data file
-    if ($output_type eq "eps") {
-	$plot_file = _make_tmpfile("plot", "eps");
-	print $handle "set output \"$plot_file\"\n";
+    if ($output_type =~ /^eps( .*)?$/) {
+	my $options = $1 || "";
+	if (defined $output_file) {
+	    $plot_file = _make_tmpfile("plot", "eps");
+	    print $handle "set output \"$plot_file\"\n";
+	}
 	#print $handle "set terminal postscript eps color \"Arial\" 18\n";
-	print $handle "set terminal postscript eps color\n";
-    } elsif ($output_type eq "pbm" || $output_type eq "gif") {
+	print $handle "set terminal postscript eps $options\n";
+    } elsif ($output_type eq "pbm" ) {
+	if (defined $output_file) {
+	    $plot_file = _make_tmpfile("plot", "pbm");
+	    print $handle "set output \"$plot_file\"\n";
+	}
+	print $handle "set terminal pbm small color\n";
+    } elsif ($output_type eq "gif") {
+	# always needs the tempfile because of conversion later on
 	$plot_file = _make_tmpfile("plot", "pbm");
 	print $handle "set output \"$plot_file\"\n";
 	print $handle "set terminal pbm small color\n";
     } elsif ($output_type eq "png") {
-	$plot_file = _make_tmpfile("plot", "png");
-	print $handle "set output \"$plot_file\"\n";
-	print $handle "set terminal png small color\n";
+	if (defined $output_file) {
+	    $plot_file = _make_tmpfile("plot", "png");
+	    print $handle "set output \"$plot_file\"\n";
+	}
+	print $handle "set terminal png small\n";
     } elsif ($output_type eq "tgif") {
-	$plot_file = _make_tmpfile("plot", "obj");
-	print $handle "set output \"$plot_file\"\n";
+	if (defined $output_file) {
+	    $plot_file = _make_tmpfile("plot", "obj");
+	    print $handle "set output \"$plot_file\"\n";
+	}
 	print $handle "set terminal tgif\n";
+    } elsif ($output_type eq 'svg') {
+	if (defined $output_file) {
+	    $plot_file = _make_tmpfile("plot", "svg");
+	    print $handle "set output \"$plot_file\"\n";
+	}
+	print $handle "set terminal svg\n";
     }
 
-    # process data sets    
-    print $handle "plot ";    
+    # process data sets
+    print $handle "plot ";
     while (@data_sets) {
 	
 	$data_set_ref = shift @data_sets;
@@ -417,7 +446,16 @@ sub gnuplot {
 	    _cleanup_tmpdir();
 	    return 0;
 	}
-    } elsif ($output_type =~ /^(pbm|eps|png|tgif)$/) {
+    } elsif (defined $output_file && $output_type =~ /^(pbm|eps(?: .*)?|png|tgif)$/) {
+	#try to get rid of the ugly warnings when moving a file on freebsd
+	if ($^O eq 'freebsd') {
+	    eval { #this is opportunistic, if it fails it doesn't really matter
+		my $gid = `/usr/bin/id -g`;
+		chomp($gid);
+		system('/usr/bin/chgrp',$gid,$plot_file);
+	    };
+	}
+
 	my $status = system("mv", "$plot_file", "$output_file");
 
         if (not _chk_status($status)) {
@@ -489,26 +527,32 @@ sub _gnuplot_data_set {
 	}
     }
     
-    print $handle "$ranges \"$filename\" $using $axes $title $style";
-
-    # we give the user 3 formats for supplying the data set
-    # 1) matrix
-    # 2) column
-    # 3) file
-    # please see the online docs for a description of these 
-    # formats
-    if ($type eq "matrix") {
-	$result = _matrix_to_file($filename, @data);
-    } elsif ($type eq "columns") {
-	$result = _columns_to_file($filename, @data);
-    } elsif ($type eq "file") {
-	$result = _file_to_file($filename, @data);
-    } elsif ($type eq "") {
-	carp "Need to specify data set type";
-	return 0;
+    if ($type eq "function") {
+        #$ranges = "[t=:]";	# XXX ?
+        print $handle "$ranges " . $data[0] . " $axes $title $style";
+	return 1;	
     } else {
-	carp "Illegal data set type: $type"; 
-        return 0;
+        print $handle "$ranges \"$filename\" $using $axes $title $style";
+
+	# we give the user 3 formats for supplying the data set
+	# 1) matrix
+	# 2) column
+	# 3) file
+	# please see the online docs for a description of these 
+	# formats
+	if ($type eq "matrix") {
+	    $result = _matrix_to_file($filename, @data);
+	} elsif ($type eq "columns") {
+	    $result = _columns_to_file($filename, @data);
+	} elsif ($type eq "file") {
+	  $result = _file_to_file($filename, @data);
+	} elsif ($type eq "") {
+	    carp "Need to specify data set type";
+	    return 0;
+	} else {
+	    carp "Illegal data set type: $type"; 
+	    return 0;
+	}
     }
     return $result;
 }
@@ -620,12 +664,16 @@ sub _matrix_to_file {
         }
         else
         {
+if (0) {
             # check that each entry ONLY has two entries
             if (@{$entry_ref} != 2) {
                 carp "Each entry must be an array of size 2";
                 return 0;
             }
             print DATA $entry_ref->[0], "\t", $entry_ref->[1], "\n";
+}
+	    # XXX
+            print DATA join("\t", @{$entry_ref}), "\n";
         }
     }
     close DATA;
@@ -731,12 +779,14 @@ sub _exec_gnuplot {
 sub _exec_pbmtogif {
     my ($pbm_file, $gif_file) = @_;
     my $status;
-    
-    if ($Chart::Graph::debug) {
-	$status = system("$ppmtogif $pbm_file > $gif_file");
-    } else {
-	$status = system("$ppmtogif $pbm_file > $gif_file 2> /dev/null");
+    my $cmd = "$ppmtogif $pbm_file ";
+    if ($gif_file) {
+	$cmd .= "> $gif_file ";
+    } 
+    unless ($Chart::Graph::debug) {
+	$cmd .= "2> /dev/null ";
     }
+    $status = system($cmd);
     
     if (not _chk_status($status)) {
 	return 0;
@@ -747,21 +797,26 @@ sub _exec_pbmtogif {
 
 #
 # Subroutine: gnuplot_date_utc()
-# 
+#
 # Description: wrapper function that handles UNIX
 #              time stamps as x values nicely
-#              
+#
 # Author: Ryan Koga - rkoga@caida.org
 #
 
 sub _gnuplot_date_utc {
-    my ($start, $end, $global_options) = @_;
+    my ($start, $end, $samp_scale, $use_local_tz, $global_options) = @_;
 
     my $min_len = 60;
     my $hour_len = $min_len*60;
     my $day_len = $hour_len*24;
     my $interval = $end - $start;
     my $min_samp;
+    my @tics;
+
+    if (!defined($samp_scale)) {
+        $samp_scale = 1;
+    }
 
     if ($interval < 10) {
 	$min_samp = 1;
@@ -797,25 +852,40 @@ sub _gnuplot_date_utc {
 	$min_samp = 2*$day_len;
     } elsif ($interval < 30*$day_len) {
 	$min_samp = 7*$day_len;
-    } else {
+    } elsif ($interval < 365*$day_len) {
 	$min_samp = 30*$day_len;
+    } elsif ($interval < 2*365*$day_len) {
+	$min_samp = 60*$day_len;
+    } else {
+	$min_samp = 120*$day_len;
     }
+    $min_samp /= $samp_scale;
     my $start_min = int($start/$min_samp);
     my $end_min = int($end/$min_samp);
-    my @tics;
 
     for (my $curr_min = $start_min; $curr_min <= $end_min; $curr_min++) {
 	my $bucket = $curr_min*$min_samp;
-	my $bucket_str;
-	my @time_data = gmtime($bucket);
+	my ($bucket_str,@time_data);
+	if ( $use_local_tz ) {
+	    @time_data = localtime($bucket);
+	} else {
+	    @time_data = gmtime($bucket);
+	}
 	$time_data[$#time_data] = -1;  # unset dst data, broken strftime
-	if ($min_samp >= $min_len) {
+
+	# keep compatibility with the undocumented 'utc_seconds' global var
+	$Chart::Graph::Gnuplot::show_seconds = $Chart::Graph::Gnuplot::utc_seconds;
+
+	if ($min_samp >= $min_len && !$Chart::Graph::Gnuplot::show_seconds) {
 	    $bucket_str = strftime("%H:%M", @time_data);
 	} else {
 	    $bucket_str = strftime("%H:%M:%S", @time_data);
 	}
 	if ($bucket_str =~ /^00:00(:00)?$/ || $curr_min == $start_min + 1) {
-	    $bucket_str .= strftime("\\n%m/%d", @time_data);
+	    $bucket_str .= strftime('\n%m/%d', @time_data);
+	    if ($Chart::Graph::Gnuplot::show_year) {
+		$bucket_str .= strftime('\n%Y', @time_data);
+	    }
 	}
 	push @tics, [ $bucket_str, $bucket ];
     }
@@ -827,14 +897,17 @@ sub _gnuplot_date_utc {
     if (defined ($global_options->{"xtics"})) {
 	push @tics, @{$global_options->{"xtics"}};
     }
-    
-    $global_options->{"xtics"} = \@tics;    
+
+    $global_options->{"xtics"} = \@tics;
     return 1;
 }
 
 
 sub _gnuplot_date_utc_normalize {
     my ($start, $end, $samp_scale, $global_options) = @_;
+    ### this code used to be used as a workaround for an old gnuplot bug
+    ### newer versions don't need it
+    carp "'uts_normalize' is going to be depreciated in a future release\n";
 
     my $min_len = 60;
     my $hour_len = $min_len*60;
@@ -895,9 +968,9 @@ sub _gnuplot_date_utc_normalize {
 	my @time_data = gmtime($bucket);
 	$time_data[$#time_data] = -1;  # unset dst data, broken strftime
 	if ($min_samp >= $min_len) {
-	    $bucket_str = strftime("%H:%M", @time_data);
+	    $bucket_str = strftime('%H:%M', @time_data);
 	} else {
-	    $bucket_str = strftime("%H:%M:%S", @time_data);
+	    $bucket_str = strftime('%H:%M:%S', @time_data);
 	}
 	my $show_date = 0;
 	if ($bucket_str =~ /^00:00(:00)?$/) {
@@ -908,7 +981,7 @@ sub _gnuplot_date_utc_normalize {
 	    $show_date = 1;
 	}
 	if ($show_date) {
-	    $bucket_str .= strftime("\\n%m/%d", @time_data);
+	    $bucket_str .= strftime('\n%m/%d', @time_data);
 	}
 	push @tics, [ $bucket_str, ($bucket - $start) / $end ];
     }
@@ -964,47 +1037,57 @@ application.
  +----------------+-----------------------------+-----------------------------+
  | NAME           |  OPTIONS                    |        DEFAULT              |
  +----------------+-----------------------------+-----------------------------+
- |"title"         |  (set your own title)       |     "untitled"              |
- |"output type"   |  "pbm" "gif" or "png"       |     "png"                   |
- |"output file"   |  (set your own output file) |     "untitled-gnuplot.png"  |
- |"x-axis label"  |  (set your own label)       |     "x-axis"                |
- |"y-axis label"  |  (set your own label)       |     "y-axis"                |
- |"x2-axis label" |  (set your own label)       |     none                    |
- |"y2-axis label" |  (set your own label)       |     none                    |
- |"logscale x"    |  "0" or "1"                 |     "0"                     |
- |"logscale y"    |  "0" or "1"                 |     "0"                     |
- |"logscale x2"   |  "0" or "1"                 |     "0"                     |
- |"logscale y2"   |  "0" or "1"                 |     "0"                     |
+ |'title'         |  set your own title         |     'untitled'              |
+ |'output type'   |  'pbm','gif','tgif','png',  |     'png'                   |
+ |                |   'svg' or "eps $epsoptions"|                             |
+ |'output file'   |  set your own output file,  |     'untitled-gnuplot.png'  |
+ |                |   undef to output to STDOUT |                             |
+ |'x-axis label'  |  set your own label         |     'x-axis'                |
+ |'y-axis label'  |  set your own label         |     'y-axis'                |
+ |'x2-axis label' |  set your own label         |     none                    |
+ |'y2-axis label' |  set your own label         |     none                    |
+ |'logscale x'    |  0 or 1                     |     0                       |
+ |'logscale y'    |  0 or 1                     |     0                       |
+ |'logscale x2'   |  0 or 1                     |     0                       |
+ |'logscale y2'   |  0 or 1                     |     0                       |
+ | 'xtics'        | set your own tics on x-axis |     none                    |
+ |                |   (see example below)       |                             |
+ | 'x2tics'       | set your own tics on x2-axis|     none                    |
+ |                |   (see example below)       |                             |
+ | 'ytics'        | set your own tics on y-axis |     none                    |
+ |                |   (see example below)       |                             |
+ | 'y2tics'       | set your own tics on y2-axis|     none                    |
+ |                |   (see example below)       |                             |
+ | 'xrange'       | set xrange, accepts both    |     none                    |
+ |                |  string '[$xmin:$xmax]'     |                             |
+ |                |  or arrayref [$xmin,$xmax]  |                             |
+ | 'yrange'       | set yrange, see xrange      |     none                    |
  |                |                             |                             |
- | "xtics"        | (set your own tics, see     |     none                    |
- |                |   example below)            |                             |
- | "x2tics"       | (set your own tics, see     |     none                    |
- |                |   example below)            |                             |
- | "ytics"        | (set your own tics, see     |     none                    |
- |                |   example below)            |                             |
- | "y2tics"       | (set your own tics, see     |     none                    |
- |                |    example below)           |                             |
- | "xrange"       | (set your own range)        |     "[{<xmin> : <xmax>}]"   |
- | "yrange"       | (set your own range)        |     "[{<ymin> : <ymax>}]"   |
- | "uts"          | (set your own range in      |     none                    |
- |                |  unix timestamps)           |                             |
- | "xdata"        | "time" to indicate that     |     none                    |
- |                | x-axis is date/time data    |                             |
- | "ydata"        | "time" to indicate that     |     none                    |
- |                | y-axis is date/time data    |                             |
- | "x2data"       | "time" to indicate that     |     none                    |
- |                | x2-axis is date/time data   |                             |
- | "y2data"       | "time" to indicate that     |     none                    |
- |                | y2-axis is date/time data   |                             |
- | "timefmt"      | "Input date/time string"    |     none                    |
- |                | see Gnuplot manual for info |                             |
- | "format"       | array ref: First element is |                             |
- |                | axis: x, y, x2, y2. Second  |                             |
- |                | element is                  |                             |
- |                | "output date/time string"   |                             |
- |                | see Gnuplot manual for info |                             |
- | "extra_opts"   | (set your own gnuplot       |     none                    |
- |                |  options separated by '\n') |                             |
+ | 'uts'          | set your own range in unix  |     none                    |
+ |                |  timestamps, array ref:     |                             |
+ |                |  [start_ts,end_ts,<scale>,  |                             |
+ |                |   <use_local_tz> ]          |                             |
+ |                |  see UNIX TIMESTAMPS example|                             |
+ | 'xdata'        | 'time' to indicate that     |     none                    |
+ |                |  x-axis is date/time data   |                             |
+ | 'ydata'        | 'time' to indicate that     |     none                    |
+ |                |  y-axis is date/time data   |                             |
+ | 'x2data'       | 'time' to indicate that     |     none                    |
+ |                |  x2-axis is date/time data  |                             |
+ | 'y2data'       | 'time' to indicate that     |     none                    |
+ |                |  y2-axis is date/time data  |                             |
+ | 'timefmt'      | "Input date/time string"    |     none                    |
+ |                |  see Gnuplot manual for info|                             |
+ | 'format'       | array ref: First element is |                             |
+ |                |  axis: 'x', 'y', 'x2', 'y2'.|                             |
+ |                |  Second element is          |                             |
+ |                |  'output date/time string"  |                             |
+ |                |  see Gnuplot manual for info|                             |
+ | 'extra_opts'   | set your own Gnuplot        |     none                    |
+ |                |  options, either an arrayref|                             |
+ |                |  or string ("\n"-separated) |                             |
+ | 'size'         | scale the display size of   |     none                    |
+ |                |  the plot, arrayref [$x, $y]|                             |
  +----------------+-----------------------------+-----------------------------+
 
  +----------------------------------------------------------------------------+
@@ -1012,13 +1095,17 @@ application.
  +----------------+-----------------------------+-----------------------------+
  |      Name      |          Options            |           Default           |
  +----------------+-----------------------------+-----------------------------+
- | "title"        | (set your own title)        |     "untitled data"         |
- | "style"        | "points", "lines",          |     "points"                |
- |                | "impulses", "<x | y | xy>"  |                             |
- |                | "errorbars", etc...         |                             |
- | "axes"         | "x1y1", "x2y2", "x1y2", etc.|      "x1y1"                 |
- | "type"         | "matrix", "columns", "file" |      no default             |
- | "using"        | (set your own format string)|      "1:2"                  |
+ | 'type'         | 'matrix', 'columns', 'file',|      none                   |
+ |                |  'function', see examples   |                             |
+ |                |  below                      |                             |
+ | 'title'        | set your own title          |     'untitled data'         |
+ | 'style'        | 'points','lines','impulses' |     'points'                |
+ |                |  'errorbars', etc...        |                             |
+ |                |  see ERRORBARS example      |                             |
+ | 'axes'         | 'x1y1', 'x2y2', 'x1y2', etc.|      'x1y1'                 |
+ | 'using'        | map data to what will be    |      '1:2'                  |
+ |                |  plotted, see ERRORBARS     |                             |
+ |                |  example                    |                             |
  +----------------+-----------------------------+-----------------------------+
 
 Data can be presented to I<Chart::Graph::Gnuplot> in one of 3 formats for
@@ -1153,25 +1240,11 @@ axes only.
  +-------------+--------------------------------------------------------------+
 
 Finally, I<Chart::Graph::Gnuplot> has an extension to support UNIX
-timestamps.  Note this B<not> built into I<Gnuplot> itself, but has
-been added for the convenience of researchers.  Users can access this
-option by setting the C<xrange> using the C<uts> option instead.  UNIX
-timestamps are only available on the x-axis at this time.  They cannot
-be used on y, x2, or y2.  See the last example for more details on
-using UNIX timestamps.
-
-=head1 NOTES ON GRAPHIC FILE FORMATS
-
-Previous versions of I<Chart::Graph::Gnuplot> provided files in the
-Graphics Interchange Format or I<gif> as a default.  This was and is
-still done via converter programs so that even with patent issues
-surrounding the I<gif> file format is available even if I<Gnuplot> 3.7.1
-and later no longer supports I<gif>.  However, it is well advised that
-users shift to the more modern and patent free Portable Network
-Graphics or I<png> format.  The I<png> file format is supported
-directly by modern versions of I<Gnuplot> so that no intermediate steps
-are necessary.  The I<png> format also provides high compression
-without any loss in image quality.
+timestamps.  Note this B<not> built into I<Gnuplot> itself.
+Users can access this option by setting the C<xrange> using the C<uts> 
+option instead.  UNIX timestamps are only available on the x-axis at this 
+time.  They cannot be used on y, x2, or y2.  See the last example for more 
+details on using UNIX timestamps.
 
 =head1 EXAMPLES
 
@@ -1188,29 +1261,26 @@ and the last is an external data file.
 
   use Chart::Graph::Gnuplot qw(gnuplot);
 
-  gnuplot({"title" => "foo",
-           "x2-axis label" => "bar",
-           "logscale x2" => "1",
-           "logscale y" => "1",
-	   "output type" => "png",
-           "output file" => "gnuplot1.png",
-           "xtics" => [ ["small\\nfoo", 10], ["medium\\nfoo", 20], ["large\\nfoo", 30] ],
-           "ytics" => [10,20,30,40,50]},
-           "xdata" => "time",
-           "format" => ["x", "%m/%d"],
-           "timefmt"=> $date_format,
-           "extra_opts" => "set key left top Left",
-          [{"title" => "data1",
-            "type" => "matrix"}, [[1, 10],
+  gnuplot({'title' => 'foo',
+           'x2-axis label' => 'bar',
+           'logscale x2' => '1',
+           'logscale y' => '1',
+           'output type' => 'png',
+           'output file' => 'gnuplot1.png',
+           'xtics' => [ ['small\nfoo', 10], ['medium\nfoo', 20], ['large\nfoo', 30] ],
+           'ytics' => [10,20,30,40,50],
+           'extra_opts' => 'set key left top Left'},
+          [{'title' => 'data1',
+            'type' => 'matrix'}, [[1, 10],
                                   [2, 20],
                                   [3, 30]] ],
-          [{"title" => "data2",
-            "style" => "lines",
-            "type" => "columns"}, [8, 26, 50, 60, 70],
+          [{'title' => 'data2',
+            'style' => 'lines',
+            'type' => 'columns'}, [8, 26, 50, 60, 70],
                                   [5, 28, 50, 60, 70] ],
-          [{"title" => "data3",
-            "style" => "lines",
-            "type" => "file"}, "samplefile"],);
+          [{'title' => 'data3',
+            'style' => 'lines',
+            'type' => 'file'}, './samplefile'],);
 
 =for html
 <p><center><img src="gnuplot1.png"></center></p>
@@ -1324,127 +1394,134 @@ created.
   #$Chart::Graph::debug = 1; 
 
   # Call and "usual" global parameters
-  gnuplot({"title" => "Corporate stock values for a major computer maker",
-           "x-axis label" => "Month and Year",
-	   "y-axis label" => "Stock price",
-	   "output type" => "png",
-           "output file" => "gnuplot3.png",
-	   # Setting date/time specific options.
-	   "xdata" => "time",
-	   "timefmt" => "%m/%d/%Y",
-	   "format" => ["x", "%m/%d/%Y"],
-	   # Set output range - note quoting of date string
-	   "xrange" => "[\"06/01/2000\":\"08/01/2001\"]",
-	   "extra_opts" => join("\n", "set grid", "set timestamp"),
-	  },
 
-	  # Data for when stock opened
-          [{"title" => "open",
-            "type" => "matrix",
-	    "style" => "lines",
-	   },
-	   [
-	    ["06/01/2000",  "81.75"],
-	    ["07/01/2000", "52.125"],
-	    ["08/01/2000", "50.3125"],
-	    ["09/01/2000", "61.3125"],
-	    ["10/01/2000", "26.6875"],
-	    ["11/01/2000", "19.4375"],
-	    ["12/01/2000", "17"],
-	    ["01/01/2001", "14.875"],
-	    ["02/01/2001", "20.6875"],
-	    ["03/01/2001", "17.8125"],
-	    ["04/01/2001", "22.09"],
-	    ["05/01/2001", "25.41"],
-	    ["06/01/2001", "20.13"],
-	    ["07/01/2001", "23.64"],
-	    ["08/01/2001", "19.01"],
-	   ]
-	  ],
+  gnuplot({'title' => 'Corporate stock values for a major computer maker',
+           'x-axis label' => 'Month and Year',
+           'y-axis label' => 'Stock price',
+           'output type' => 'png',
+           'output file' => 'gnuplot3.png',
+           # Setting date/time specific options.
+           'xdata' => 'time',
+           'timefmt' => '%m/%d/%Y',
+           'format' => ['x', '%m/%d/%Y'],
+           # Set output range - note quoting of date string
+           'xrange' => '["06/01/2000":"08/01/2001"]',
+           'extra_opts' => join("\n", 'set grid', 'set timestamp'),
+          },
+          # Data for when stock opened
+          [{'title' => 'open',
+            'type' => 'matrix',
+            'style' => 'lines',
+           },
+           [
+            ['06/01/2000',  '81.75'],
+            ['07/01/2000', '52.125'],
+            ['08/01/2000', '50.3125'],
+            ['09/01/2000', '61.3125'],
+            ['10/01/2000', '26.6875'],
+            ['11/01/2000', '19.4375'],
+            ['12/01/2000', '17'],
+            ['01/01/2001', '14.875'],
+            ['02/01/2001', '20.6875'],
+            ['03/01/2001', '17.8125'],
+            ['04/01/2001', '22.09'],
+            ['05/01/2001', '25.41'],
+            ['06/01/2001', '20.13'],
+            ['07/01/2001', '23.64'],
+            ['08/01/2001', '19.01'],
+           ]
+          ],
 
+          # Data for stock high
+          [{'title' => 'high',
+            'type' => 'matrix',
+            'style' => 'lines',
+           },
+           [
+            ['06/01/2000', '103.9375'],
+            ['07/01/2000', '60.625'],
+            ['08/01/2000', '61.50'],
+            ['09/01/2000', '64.125'],
+            ['10/01/2000', '26.75'],
+            ['11/01/2000', '23'],
+            ['12/01/2000', '17.50'],
+            ['01/01/2001', '22.50'],
+            ['02/01/2001', '21.9375'],
+            ['03/01/2001', '23.75'],
+            ['04/01/2001', '27.12'],
+            ['05/01/2001', '26.70'],
+            ['06/01/2001', '25.10'],
+            ['07/01/2001', '25.22'],
+            ['08/01/2001', '19.90'],
+           ]
+          ],
 
-	  # Data for stock high
-          [{"title" => "high",
-            "type" => "matrix",
-	    "style" => "lines",
-	   },
-	   [
-	    ["06/01/2000", "103.9375"],
-	    ["07/01/2000", "60.625"],
-	    ["08/01/2000", "61.50"],
-	    ["09/01/2000", "64.125"],
-	    ["10/01/2000", "26.75"],
-	    ["11/01/2000", "23"],
-	    ["12/01/2000", "17.50"],
-	    ["01/01/2001", "22.50"],
-	    ["02/01/2001", "21.9375"],
-	    ["03/01/2001", "23.75"],
-	    ["04/01/2001", "27.12"],
-	    ["05/01/2001", "26.70"],
-	    ["06/01/2001", "25.10"],
-	    ["07/01/2001", "25.22"],
-	    ["08/01/2001", "19.90"],
-	   ]
-	   ],
+          # Data for stock close
+          [{'title' => 'close',
+            'type' => 'matrix',
+            'style' => 'lines',
+           },
+           [
 
-
-	  # Data for stock close
-          [{"title" => "close",
-            "type" => "matrix",
-	    "style" => "lines",
-	   },
-	   [
-
-	    ["06/01/2000", "52.375"],
-	    ["07/01/2000", "50.8125"],
-	    ["08/01/2000", "60.9375"],
-	    ["09/01/2000", "25.75"],
-	    ["10/01/2000", "19.5625"],
-	    ["11/01/2000", "16.50"],
-	    ["12/01/2000", "14.875"],
-	    ["01/01/2001", "21.625"],
-	    ["02/01/2001", "18.25"],
-	    ["03/01/2001", "22.07"],
-	    ["04/01/2001", "25.49"],
-	    ["05/01/2001", "19.95"],
-	    ["06/01/2001", "23.25"],
-	    ["07/01/2001", "18.79"],
-	    ["08/01/2001", "18.55"],
-	   ]
-	  ]
+            ['06/01/2000', '52.375'],
+            ['07/01/2000', '50.8125'],
+            ['08/01/2000', '60.9375'],
+            ['09/01/2000', '25.75'],
+            ['10/01/2000', '19.5625'],
+            ['11/01/2000', '16.50'],
+            ['12/01/2000', '14.875'],
+            ['01/01/2001', '21.625'],
+            ['02/01/2001', '18.25'],
+            ['03/01/2001', '22.07'],
+            ['04/01/2001', '25.49'],
+            ['05/01/2001', '19.95'],
+            ['06/01/2001', '23.25'],
+            ['07/01/2001', '18.79'],
+            ['08/01/2001', '18.55'],
+           ]
+          ]
 );
+
+
 
 =for html
 <p><center><img src="gnuplot3.png"></center></p>
 <p><center><em>gnuplot3.png</em></center></p>
 
-=head2 UNIX TIME STAMPS
+=head2 UNIX TIMESTAMPS
 
 I<Chart::Graph::Gnuplot> can convert Unix timestamps into normal dates
 for x-axis values. Collisions with existing user x-tics are can be
-remedied by prepending "\\n" to their tic-labels.
+remedied by prepending a literal '\n' (or "\\n") to their tic-labels.
+The 'uts' option takes an array ref with 2 to 4 elements:
+[ start_timestamp, end_timestamp, <scale>, <use_local_timezone> ]
+If the optional element 'scale' is > 1 the number of tics will be reduced.
+If the optional element 'use_local_timezone' is set to non-zero value
+the local timezone is used, UTC is assumed otherwise.
+The variables I<$Chart::Graph::Gnuplot::show_year> and 
+I<$Chart::Graph::Gnuplot::show_seconds> influence the formatting of the x-tics.
 
     [...]
 
     %options = (
-                 "title" => "foo",
-                 "output file" => "gnuplot4.gif",
-		 "output type" => "gif",
-                 "x2-axis label" => "bar",
-                 "xtics" => [ ["\\n10pm", 954795600] ],
-                 "ytics" => [10,20,30,40,50],
-                 "extra_opts" => "set nokey",
-                 "uts" => [954791100, 954799300],
+                 'title' => 'uts example',
+                 'output file' => 'gnuplot4.gif',
+                 'output type' => 'gif',
+                 'x2-axis label' => 'time',
+                 'xtics' => [ ['\n9pm UTC', 954795600] ],
+                 'ytics' => [10,20,30,40,50],
+                 'extra_opts' => 'set nokey',
+                 'uts' => [954791100, 954799300],
                );
 
-    $plot = [{"title" => "Your title",
-              "type" => "matrix"},
+    $plot = [{'title' => 'Your title',
+              'type' => 'matrix'},
               [
                 [954792100, 10],
                 [954793100, 18],
                 [954794100, 12],
                 [954795100, 26],
-                [954795600, 13], # 22:00
+                [954795600, 13], # 21:00
                 [954796170, 23],
                 [954797500, 37],
                 [954799173, 20],
@@ -1463,8 +1540,56 @@ B<Note:> The present implementation of UNIX time stamps only supports
 assigning I<xtics> for x-axis labels.  Using the Gnuplot directive:
 C<format> is not supported.
 
+=head2 FUNCTIONS
+
+I<Chart::Graph::Gnuplot> supports the plotting of functions, this can
+be mixed with other data-types:
+
+   my %options = (
+                   'title' => 'plot functions example',
+                   'output file' => 'gnuplot5.png',
+                 );
+
+   my $data = [{ 'title' => 'data 1',
+                 'style' => 'lines',
+                 'type' => 'matrix',
+               },
+               [
+                 [0,10],
+                 [3,30],
+                 [6,0],
+                 [9,-10],
+                 [12,-0],
+               ]
+              ];
+
+   my $fnc1 = [{ 'title' => 'function 1',
+                 'style' => 'lines',
+                 'type' => 'function',
+               },
+               '10*sin(x)+2*cos(1.1 * x)+.5*tan(x)'
+              ];
+
+   my $fnc2 = [{ 'title' => 'function 2',
+                 'style' => 'lines',
+                 'type' => 'function',
+               },
+              '20*sin(sqrt(2**x))/sqrt(2**x)'
+              ];
+
+    gnuplot(\%options, $data, $fnc1, $fnc2);
+
+
+=for html
+<p><center><img src="gnuplot5.png"></center></p>
+<p><center><em>gnuplot5.png</em></center></p>
+
 
 =head1 MORE INFO
+
+This version of I<Chart::Graph::Gnuplot> was tested against
+Gnuplot Version 4.0 patchlevel 0, some features might not work
+on older versions of gnuplot. 
 
 For more information on gnuplot, please see the gnuplot web page:
 
