@@ -35,7 +35,7 @@
 ## Contact: graph-dev@caida.org
 ##
 ##
-$VERSION = 3.0;
+$VERSION = 3.1;
 package Chart::Graph::Xmgrace::Axis;
 @ISA = qw(Chart::Graph::Xmgrace::Base_Option);
 use Carp;

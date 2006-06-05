@@ -44,7 +44,7 @@
 ##
 ##
 
-$VERSION = 3.0;
+$VERSION = 3.1;
 
 use Chart::Graph::Xmgrace::Axis_Option;		
 use Carp;

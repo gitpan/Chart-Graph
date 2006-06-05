@@ -39,7 +39,7 @@
 package Chart::Graph;
 use Exporter();
 
-$VERSION = '3.0';
+$VERSION = '3.1';
 @ISA = qw(Exporter);
 @EXPORT = qw();
 @EXPORT_OK = qw(&gnuplot &xrt3d &xrt2d &xmgrace);

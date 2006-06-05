@@ -1,7 +1,7 @@
 ## Xrt3d.pm is a sub-module of Graph.pm. It has all the subroutines 
 ## needed for the Xrt3d part of the package.
 ##
-## $Id: Xrt3d.pm,v 1.27 2006/04/18 17:56:48 emile Exp $ $Name:  $
+## $Id: Xrt3d.pm,v 1.28 2006/06/02 23:33:07 emile Exp $ $Name:  $
 ##
 ## This software product is developed by Michael Young and David Moore,
 ## and copyrighted(C) 1998 by the University of California, San Diego
@@ -49,12 +49,12 @@ use Carp;			# for carp() and croak()
 use Chart::Graph::Utils qw(:UTILS);	# get global subs and variables
 use Chart::Graph::XrtUtils qw(:UTILS);
 
-$cvs_Id = '$Id: Xrt3d.pm,v 1.27 2006/04/18 17:56:48 emile Exp $';
+$cvs_Id = '$Id: Xrt3d.pm,v 1.28 2006/06/02 23:33:07 emile Exp $';
 $cvs_Author = '$Author: emile $';
 $cvs_Name = '$Name:  $';
-$cvs_Revision = '$Revision: 1.27 $';
+$cvs_Revision = '$Revision: 1.28 $';
 
-$VERSION = 3.0;
+$VERSION = 3.1;
 
 use strict;
 
@@ -527,7 +527,7 @@ provided.
 			   ["70", "45", "10", "5", "4", "3"]])
 
 =for html
-<p><center><img src="xrt3d-1.jpg"></center></p>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/xrt3d-1.jpg"></center></p>
 <p><center><em>xrt3d-1.jpg</em></center></p>
 
 =head2 EXAMPLE: EARLY GROWTH OF THE INTERNET
@@ -568,7 +568,7 @@ of the newest graphics formats the PNG format: F<xrt3d-2.png>.
         );
 
 =for html
-<p><center><img src="xrt3d-2.png"></center></p>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/xrt3d-2.png"></center></p>
 <p><center><em>xrt3d-2.png</em></center></p>
 
 =head2 EXAMPLE: USING A DATA FILE FOR INPUT
@@ -597,7 +597,7 @@ The data file used in the above example is as follows.
  29 15 64 24
 
 =for html
-<p><center><img src="xrt3d-3.gif"></center></p>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/xrt3d-3.gif"></center></p>
 <p><center><em>xrt3d-3.gif</em></center></p>
 
 

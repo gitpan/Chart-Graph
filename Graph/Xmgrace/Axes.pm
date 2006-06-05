@@ -39,7 +39,7 @@
 #                  1) Chart::Graph::Xmgrace::Axes_Options
 #
 
-$VERSION = 3.0;
+$VERSION = 3.1;
 
 package Chart::Graph::Xmgrace::Axes;
 @ISA = qw(Chart::Graph::Xmgrace::Axis_Option);

@@ -45,7 +45,7 @@
 ##
 ##
 
-$VERSION = 3.0;
+$VERSION = 3.1;
 
 use Chart::Graph::Xmgrace::Dataset_Options;
 use Chart::Graph::Xmgrace::Base_Dataset_Option;

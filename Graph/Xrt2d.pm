@@ -1,7 +1,7 @@
 ## Xrt2d.pm is a sub-module of Graph.pm. It has all the subroutines 
 ## needed for the Xrt2d part of the package.
 ##
-## $Id: Xrt2d.pm,v 1.23 2006/04/18 17:56:48 emile Exp $ $Name:  $
+## $Id: Xrt2d.pm,v 1.24 2006/06/02 23:33:07 emile Exp $ $Name:  $
 ##
 ## This software product is developed by Michael Young and David Moore,
 ## and copyrighted(C) 1998 by the University of California, San Diego
@@ -50,12 +50,12 @@ use Carp;			# for carp() and croak()
 use Chart::Graph::Utils qw(:UTILS);	# get global subs and variables
 use Chart::Graph::XrtUtils qw(:UTILS); # get Xrt subroutines
 
-$cvs_Id = '$Id: Xrt2d.pm,v 1.23 2006/04/18 17:56:48 emile Exp $';
+$cvs_Id = '$Id: Xrt2d.pm,v 1.24 2006/06/02 23:33:07 emile Exp $';
 $cvs_Author = '$Author: emile $';
 $cvs_Name = '$Name:  $';
-$cvs_Revision = '$Revision: 1.23 $';
+$cvs_Revision = '$Revision: 1.24 $';
 
-$VERSION = 3.0;
+$VERSION = 3.1;
 
 use strict;
 
@@ -809,7 +809,7 @@ single graphic file F<xrt2d-1.jpg>.
  )
 
 =for html
-<p><center><img src="xrt2d-1.jpg"></center></p>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/xrt2d-1.jpg"></center></p>
 <p><center><em>xrt2d-1.jpg</em></center></p>
 
 =head2 VERTICAL BAR GRAPH
@@ -834,7 +834,7 @@ unpredicable results.
       );
 
 =for html
-<p><center><img src="xrt2d-2.gif"></center></p>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/xrt2d-2.gif"></center></p>
 <p><center><em>xrt2d-2.gif</em></center></p>
 
 

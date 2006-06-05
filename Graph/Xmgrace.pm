@@ -1,7 +1,7 @@
 ## Xmgrace.pm is a sub-module of Graph.pm. It has all the subroutines 
 ## needed for the gnuplot part of the package.
 ##
-## $Id: Xmgrace.pm,v 1.31 2006/04/18 17:56:48 emile Exp $ $Name:  $
+## $Id: Xmgrace.pm,v 1.32 2006/06/02 23:33:07 emile Exp $ $Name:  $
 ##
 ## This software product is developed by Esmond Lee and David Moore,
 ## and copyrighted(C) 1998 by the University of California, San Diego
@@ -52,12 +52,12 @@ use Chart::Graph::Xmgrace::Graph_Presentation_Type;
 use Chart::Graph::Xmgrace::Dataset;
 use FileHandle;
 
-$cvs_Id = '$Id: Xmgrace.pm,v 1.31 2006/04/18 17:56:48 emile Exp $';
+$cvs_Id = '$Id: Xmgrace.pm,v 1.32 2006/06/02 23:33:07 emile Exp $';
 $cvs_Author = '$Author: emile $';
 $cvs_Name = '$Name:  $';
-$cvs_Revision = '$Revision: 1.31 $';
+$cvs_Revision = '$Revision: 1.32 $';
 
-$VERSION = 3.0;
+$VERSION = 3.1;
 
 use strict;
 
@@ -1684,7 +1684,7 @@ last plot is a bar graph.
        );
 
 =for html
-<p><center><img src="xmgrace1.png"></center></p>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/xmgrace1.png"></center></p>
 <p><center><em>xmgrace1.png</em></center></p>
 
 =head2 NON-STACKING REGIONS
@@ -1716,7 +1716,7 @@ data.)
 	 );
 
 =for html
-<p><center><img src="xmgrace2.png"></center></p>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/xmgrace2.png"></center></p>
 <p><center><em>xmgrace2.png</em></center></p>
 
 
@@ -1927,7 +1927,7 @@ Data-Dumper.
 
 
 =for html
-<p><center><img src="xmgrace3.png"></center></p>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/xmgrace3.png"></center></p>
 <p><center><em>xmgrace3.png</em></center></p>
 
 

@@ -1,7 +1,7 @@
 ## Gnuplot.pm is a sub-module of Graph.pm. It has all the subroutines 
 ## needed for the gnuplot part of the package.
 ##
-## $Id: Gnuplot.pm,v 1.44 2006/04/18 17:56:47 emile Exp $ $Name:  $
+## $Id: Gnuplot.pm,v 1.45 2006/06/02 23:33:07 emile Exp $ $Name:  $
 ##
 ## This software product is developed by Michael Young and David Moore,
 ## and copyrighted(C) 1998 by the University of California, San Diego
@@ -49,12 +49,12 @@ use Chart::Graph::Utils qw(:UTILS);	# get global subs and variable
 use POSIX 'strftime';
 use FileHandle;
 
-$cvs_Id = '$Id: Gnuplot.pm,v 1.44 2006/04/18 17:56:47 emile Exp $';
+$cvs_Id = '$Id: Gnuplot.pm,v 1.45 2006/06/02 23:33:07 emile Exp $';
 $cvs_Author = '$Author: emile $';
 $cvs_Name = '$Name:  $';
-$cvs_Revision = '$Revision: 1.44 $';
+$cvs_Revision = '$Revision: 1.45 $';
 
-$VERSION = 3.0;
+$VERSION = 3.1;
 
 use strict;
 
@@ -1283,7 +1283,7 @@ and the last is an external data file.
             'type' => 'file'}, './samplefile'],);
 
 =for html
-<p><center><img src="gnuplot1.png"></center></p>
+<p><center><img src="http://http://www.caida.org/tools/utilities/graphing/gnuplot1.png"></center></p>
 <p><center><em>gnuplot1.png</em></center></p>
 
 =head2 ERRORBARS
@@ -1370,7 +1370,7 @@ C<xdelta>, C<xlow> and C<xhigh>.
            );
 
 =for html
-<p><center><img src="gnuplot2.gif"></center></p>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/gnuplot2.gif"></center></p>
 <p><center><em>gnuplot2.gif</em></center></p>
 
 =head2 PLOTTING DATES - CUSTOM GNUPLOT OPTIONS
@@ -1485,7 +1485,7 @@ created.
 
 
 =for html
-<p><center><img src="gnuplot3.png"></center></p>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/gnuplot3.png"></center></p>
 <p><center><em>gnuplot3.png</em></center></p>
 
 =head2 UNIX TIMESTAMPS
@@ -1532,7 +1532,7 @@ I<$Chart::Graph::Gnuplot::show_seconds> influence the formatting of the x-tics.
     gnuplot(\%options, $plot);
 
 =for html
-<p><center><img src="gnuplot4.gif"></center></p>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/gnuplot4.gif"></center></p>
 <p><center><em>gnuplot4.gif</em></center></p>
 
 
@@ -1581,7 +1581,7 @@ be mixed with other data-types:
 
 
 =for html
-<p><center><img src="gnuplot5.png"></center></p>
+<p><center><img src="http://www.caida.org/tools/utilities/graphing/gnuplot5.png"></center></p>
 <p><center><em>gnuplot5.png</em></center></p>
 
 

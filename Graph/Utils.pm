@@ -66,7 +66,7 @@ $cvs_Author = '$Author: emile $';
 $cvs_Name = '$Name:  $';
 $cvs_Revision = '$Revision: 1.22 $';
 
-$VERSION = 3.0;
+$VERSION = 3.1;
 
 use strict;
 
