@@ -36,7 +36,7 @@
 ##
 ##
 
-$VERSION = 3.1;
+$VERSION = 3.2;
 
 use Chart::Graph::Xmgrace::Base_Dataset_Option;
 use Carp;

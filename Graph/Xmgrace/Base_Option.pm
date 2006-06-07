@@ -36,7 +36,7 @@
 ##
 ##
 
-$VERSION = 3.1;
+$VERSION = 3.2;
 
 package Chart::Graph::Xmgrace::Base_Option;
 use Carp;

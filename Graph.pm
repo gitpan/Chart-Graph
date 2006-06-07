@@ -1,7 +1,7 @@
 ## Graph.pm is a graphing package that supports on-the-fly graphing 
 ## from the gnuplot, XRT, and Xmgrace graphing packages.
 ##
-## $Id: Graph.pm,v 1.45 2006/04/18 17:56:47 emile Exp $ $Name:  $
+## $Id: Graph.pm,v 1.48 2006/06/07 21:09:32 emile Exp $ $Name:  $
 ##
 ## This software product is developed by Michael Young and David Moore,
 ## and copyrighted(C) 1998 by the University of California, San Diego
@@ -39,15 +39,15 @@
 package Chart::Graph;
 use Exporter();
 
-$VERSION = '3.1';
+$VERSION = '3.2';
 @ISA = qw(Exporter);
 @EXPORT = qw();
 @EXPORT_OK = qw(&gnuplot &xrt3d &xrt2d &xmgrace);
 
-$cvs_Id = '$Id: Graph.pm,v 1.45 2006/04/18 17:56:47 emile Exp $';
+$cvs_Id = '$Id: Graph.pm,v 1.48 2006/06/07 21:09:32 emile Exp $';
 $cvs_Author = '$Author: emile $';
 $cvs_Name = '$Name:  $';
-$cvs_Revision = '$Revision: 1.45 $';
+$cvs_Revision = '$Revision: 1.48 $';
 
 use Chart::Graph::Utils qw(:USER);
 use Chart::Graph::Gnuplot qw(&gnuplot);
@@ -240,9 +240,9 @@ For more information on Xmgrace, please see the Xmgrace web page:
 
  http://plasma-gate.weizmann.ac.il/Grace
 
-For more information on XRT, please contact Sitraka:
+For more information on XRT, please contact Sitraka (now Quest):
 
- http://www.sitraka.com
+ http://www.quest.com/xrt_pds/
 
 =head1 CONTACT
 

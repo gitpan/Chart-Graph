@@ -35,7 +35,7 @@
 ## Contact: graph-dev@caida.org
 ##
 ##
-$VERSION = 3.1;
+$VERSION = 3.2;
 
 package Chart::Graph::Xmgrace::Axis_Option;
 use Carp;

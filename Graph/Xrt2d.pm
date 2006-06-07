@@ -1,7 +1,7 @@
 ## Xrt2d.pm is a sub-module of Graph.pm. It has all the subroutines 
 ## needed for the Xrt2d part of the package.
 ##
-## $Id: Xrt2d.pm,v 1.24 2006/06/02 23:33:07 emile Exp $ $Name:  $
+## $Id: Xrt2d.pm,v 1.26 2006/06/07 21:09:33 emile Exp $ $Name:  $
 ##
 ## This software product is developed by Michael Young and David Moore,
 ## and copyrighted(C) 1998 by the University of California, San Diego
@@ -50,12 +50,12 @@ use Carp;			# for carp() and croak()
 use Chart::Graph::Utils qw(:UTILS);	# get global subs and variables
 use Chart::Graph::XrtUtils qw(:UTILS); # get Xrt subroutines
 
-$cvs_Id = '$Id: Xrt2d.pm,v 1.24 2006/06/02 23:33:07 emile Exp $';
+$cvs_Id = '$Id: Xrt2d.pm,v 1.26 2006/06/07 21:09:33 emile Exp $';
 $cvs_Author = '$Author: emile $';
 $cvs_Name = '$Name:  $';
-$cvs_Revision = '$Revision: 1.24 $';
+$cvs_Revision = '$Revision: 1.26 $';
 
-$VERSION = 3.1;
+$VERSION = 3.2;
 
 use strict;
 

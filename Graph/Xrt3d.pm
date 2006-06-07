@@ -1,7 +1,7 @@
 ## Xrt3d.pm is a sub-module of Graph.pm. It has all the subroutines 
 ## needed for the Xrt3d part of the package.
 ##
-## $Id: Xrt3d.pm,v 1.28 2006/06/02 23:33:07 emile Exp $ $Name:  $
+## $Id: Xrt3d.pm,v 1.30 2006/06/07 21:09:33 emile Exp $ $Name:  $
 ##
 ## This software product is developed by Michael Young and David Moore,
 ## and copyrighted(C) 1998 by the University of California, San Diego
@@ -49,12 +49,12 @@ use Carp;			# for carp() and croak()
 use Chart::Graph::Utils qw(:UTILS);	# get global subs and variables
 use Chart::Graph::XrtUtils qw(:UTILS);
 
-$cvs_Id = '$Id: Xrt3d.pm,v 1.28 2006/06/02 23:33:07 emile Exp $';
+$cvs_Id = '$Id: Xrt3d.pm,v 1.30 2006/06/07 21:09:33 emile Exp $';
 $cvs_Author = '$Author: emile $';
 $cvs_Name = '$Name:  $';
-$cvs_Revision = '$Revision: 1.28 $';
+$cvs_Revision = '$Revision: 1.30 $';
 
-$VERSION = 3.1;
+$VERSION = 3.2;
 
 use strict;
 
